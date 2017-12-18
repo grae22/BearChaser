@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BearChaser", "BearChaser\BearChaser.csproj", "{B8549F5D-76C4-4294-87BD-12319BCA9F83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BearChaser.Test", "BearChaser.Test\BearChaser.Test.csproj", "{E07BBECF-74D8-4750-980E-E5A3475A7170}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8549F5D-76C4-4294-87BD-12319BCA9F83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8549F5D-76C4-4294-87BD-12319BCA9F83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8549F5D-76C4-4294-87BD-12319BCA9F83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8549F5D-76C4-4294-87BD-12319BCA9F83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E07BBECF-74D8-4750-980E-E5A3475A7170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E07BBECF-74D8-4750-980E-E5A3475A7170}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E07BBECF-74D8-4750-980E-E5A3475A7170}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E07BBECF-74D8-4750-980E-E5A3475A7170}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D946F14-913E-4CC8-85DE-4B82193CBF97}
+	EndGlobalSection
+EndGlobal
