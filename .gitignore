@@ -1,5 +1,7 @@
 *.suo
 *.user
+*.mdf
+*.ldf
 
 .vs/
 bin/
