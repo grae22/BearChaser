@@ -1,6 +1,4 @@
-﻿// TODO: Something needs to clear out expired tokens from time to time.
-
-using System;
+﻿using System;
 using Newtonsoft.Json;
 
 namespace BearChaser.Models

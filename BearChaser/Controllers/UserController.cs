@@ -17,6 +17,7 @@ namespace BearChaser.Controllers
     //---------------------------------------------------------------------------------------------
 
     private readonly IUserStore _userStore;
+    private readonly ITokenStore _tokenStore;
     private readonly IUserSettings _userSettings;
     private readonly IDateTimeSource _dateTimeSource;
     private readonly ILogger _log;
@@ -24,11 +25,13 @@ namespace BearChaser.Controllers
     //---------------------------------------------------------------------------------------------
 
     public UserController(IUserStore userStore,
+                          ITokenStore tokenStore,
                           IUserSettings userSettings,
                           IDateTimeSource dateTimeSource,
                           ILogger log)
     {
       _userStore = userStore;
+      _tokenStore = tokenStore;
       _userSettings = userSettings;
       _dateTimeSource = dateTimeSource;
       _log = log;
@@ -113,41 +116,20 @@ namespace BearChaser.Controllers
 
     private async Task<Guid> AllocateTokenAsync(User user)
     {
-      DateTime now = _dateTimeSource.Now;
-
-      if (HasValidToken(now, user))
+      if (_tokenStore.IsTokenValid(user.Token))
       {
         _log.LogDebug($"Using existing valid token for user '{user.Username}'. {user.Token}");
 
         return user.Token.Value;
       }
 
-      // TODO: Move out to a token issuing class.
-      user.Token = new Token
-      {
-        Value = Guid.NewGuid(),
-        Expiry = now.AddMinutes(_userSettings.UserTokenLifetimeInMinutes)
-      };
+      user.Token = await _tokenStore.GetNewTokenAsync();
 
       await _userStore.SaveAsync();
 
       _log.LogDebug($"Allocated token for user '{user.Username}'. {user.Token}");
 
       return user.Token.Value;
-    }
-
-    //---------------------------------------------------------------------------------------------
-
-    private static bool HasValidToken(DateTime dateTime, User user)
-    {
-      if (user.Token == null)
-      {
-        return false;
-      }
-
-      bool isTokenStillValid = dateTime < user.Token.Expiry;
-
-      return isTokenStillValid;
     }
 
     //---------------------------------------------------------------------------------------------

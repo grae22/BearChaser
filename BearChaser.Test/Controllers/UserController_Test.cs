@@ -25,9 +25,10 @@ namespace BearChaser.Test.Controllers
     {
       // Arrange.
       var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Register("  ", "password");
@@ -49,10 +50,12 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync("username").Returns(new User());
 
+      var tokenStore = Substitute.For<ITokenStore>();
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "password");
@@ -74,10 +77,12 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns((User)null);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "1234567");
@@ -99,10 +104,12 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns((User)null);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "12345678");
@@ -122,7 +129,7 @@ namespace BearChaser.Test.Controllers
     {
       // Arrange.
       var tokenValue = Guid.NewGuid();
-
+      
       var user = new User
       {
         Password = "CorrectPassword".GetAsPasswordHash(),
@@ -132,11 +139,14 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns(user);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+      tokenStore.IsTokenValid(Arg.Any<Token>()).Returns(true);
+
       var userSettings = CreateUserSettings();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, dateTimeSource, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, dateTimeSource, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", "CorrectPassword");
@@ -157,10 +167,12 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns((User)null);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", string.Empty);
@@ -186,10 +198,12 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns(user);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", "IncorrectPassword");
@@ -216,11 +230,14 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns(user);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+      tokenStore.GetNewTokenAsync().Returns(new Token());
+
       var userSettings = CreateUserSettings();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, dateTimeSource, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, dateTimeSource, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
@@ -244,18 +261,20 @@ namespace BearChaser.Test.Controllers
         Password = "CorrectPassword".GetAsPasswordHash(),
         Token = new Token
         {
-          Value = token,
-          Expiry = now.Now.AddMilliseconds(1)
+          Value = token
         }
       };
 
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns(user);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+      tokenStore.IsTokenValid(Arg.Any<Token>()).Returns(true);
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, now, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, now, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
@@ -287,10 +306,13 @@ namespace BearChaser.Test.Controllers
       var userStore = Substitute.For<IUserStore>();
       userStore.GetUserAsync(Arg.Any<string>()).Returns(user);
 
+      var tokenStore = Substitute.For<ITokenStore>();
+      tokenStore.GetNewTokenAsync().Returns(new Token());
+
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, userSettings, now, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, now, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
@@ -306,7 +328,6 @@ namespace BearChaser.Test.Controllers
       var settings = Substitute.For<IUserSettings>();
 
       settings.UserPasswordMinLength.Returns(8);
-      settings.UserTokenLifetimeInMinutes.Returns(5);
       
       return settings;
     }

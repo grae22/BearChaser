@@ -1,12 +1,14 @@
-﻿using NUnit.Framework;
+﻿using System.Threading.Tasks;
+using BearChaser.Models;
 
-namespace BearChaser.Test.Stores
+namespace BearChaser.Stores
 {
-  [TestFixture]
-  [Category("UserStore")]
-  public class UserStore_Test
+  public interface ITokenStore
   {
     //---------------------------------------------------------------------------------------------
+
+    Task<Token> GetNewTokenAsync();
+    bool IsTokenValid(Token token);
 
     //---------------------------------------------------------------------------------------------
   }

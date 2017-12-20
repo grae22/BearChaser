@@ -5,18 +5,20 @@ using BearChaser.Utils.Logging;
 
 namespace BearChaser.Settings
 {
-  internal class AllSettings : IUserSettings, ILogSettings
+  internal class AllSettings : IUserSettings, ILogSettings, ITokenSettings
   {
     //---------------------------------------------------------------------------------------------
 
     // IUserSettings
-    public int UserPasswordMinLength { get; private set; }
-    public int UserTokenLifetimeInMinutes { get; private set; }
+    public int UserPasswordMinLength { get; private set; } = 8;
 
     // ILogSettings
-    public string ApplicationName { get; private set; }
-    public string LogFolderPath { get; private set; }
-    public string LowestPriorityCategoryToLog { get; private set; }
+    public string ApplicationName { get; private set; } = "BearChaser";
+    public string LogFolderPath { get; private set; } = string.Empty;
+    public string LowestPriorityCategoryToLog { get; private set; } = "Debug";
+
+    // ITokenSettings
+    public int TokenLifetimeInMinutes { get; private set; } = 5;
 
     //---------------------------------------------------------------------------------------------
 
@@ -31,23 +33,30 @@ namespace BearChaser.Settings
 
       LoadUserSettings();
       LoadLogSettings();
+      LoadTokenSettings();
     }
 
     //---------------------------------------------------------------------------------------------
 
     private void LoadUserSettings()
     {
-      UserPasswordMinLength = _settingsStore.GetValue("UserPasswordMinLength", 8);
-      UserTokenLifetimeInMinutes = _settingsStore.GetValue("UserTokenLifetimeInMinutes", 5);
+      UserPasswordMinLength = _settingsStore.GetValue("UserPasswordMinLength", UserPasswordMinLength);
     }
 
     //---------------------------------------------------------------------------------------------
 
     private void LoadLogSettings()
     {
-      ApplicationName = _settingsStore.GetValue("LogApplicationName", "BearChaser");
-      LogFolderPath = _settingsStore.GetValue("LogFolderPath", string.Empty);
-      LowestPriorityCategoryToLog = _settingsStore.GetValue("LogLowestPriorityCategory", "Debug");
+      ApplicationName = _settingsStore.GetValue("LogApplicationName", ApplicationName);
+      LogFolderPath = _settingsStore.GetValue("LogFolderPath", LogFolderPath);
+      LowestPriorityCategoryToLog = _settingsStore.GetValue("LogLowestPriorityCategory", LowestPriorityCategoryToLog);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    private void LoadTokenSettings()
+    {
+      TokenLifetimeInMinutes = _settingsStore.GetValue("TokenLifetimeInMinutes", TokenLifetimeInMinutes);
     }
 
     //---------------------------------------------------------------------------------------------

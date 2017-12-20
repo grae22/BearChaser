@@ -1,10 +1,10 @@
 ﻿namespace BearChaser.Settings
 {
-  public interface IUserSettings
+  public interface ITokenSettings
   {
     //---------------------------------------------------------------------------------------------
 
-    int UserPasswordMinLength { get; }
+    int TokenLifetimeInMinutes { get; }
 
     //---------------------------------------------------------------------------------------------
   }

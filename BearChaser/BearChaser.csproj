@@ -247,12 +247,15 @@
     <Compile Include="Models\Token.cs" />
     <Compile Include="Settings\AllSettings.cs" />
     <Compile Include="Settings\ILogSettings.cs" />
+    <Compile Include="Settings\ITokenSettings.cs" />
     <Compile Include="Settings\IUserSettings.cs" />
     <Compile Include="Models\Setting.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stores\ITokenStore.cs" />
     <Compile Include="Stores\IUserStore.cs" />
     <Compile Include="Stores\SettingsStore.cs" />
+    <Compile Include="Stores\TokenStore.cs" />
     <Compile Include="Stores\UserStore.cs" />
     <Compile Include="Utils\DateTimeSource.cs" />
     <Compile Include="Utils\IDateTimeSource.cs" />
