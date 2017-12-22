@@ -17,30 +17,38 @@ namespace BearChaser.Utils.Logging
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogDebug(string message, bool includeStackTrace = false)
+    public void LogDebug(string message,
+                         bool includeStackTrace = false,
+                         string source = null)
     {
-      _logs.ForEach(l => l.LogDebug(message, includeStackTrace));
+      _logs.ForEach(l => l.LogDebug(message, includeStackTrace, source));
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogInfo(string message, bool includeStackTrace = false)
+    public void LogInfo(string message,
+                        bool includeStackTrace = false,
+                        string source = null)
     {
-      _logs.ForEach(l => l.LogInfo(message, includeStackTrace));
+      _logs.ForEach(l => l.LogInfo(message, includeStackTrace, source));
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogWarning(string message, bool includeStackTrace = false)
+    public void LogWarning(string message,
+                           bool includeStackTrace = false,
+                           string source = null)
     {
-      _logs.ForEach(l => l.LogWarning(message, includeStackTrace));
+      _logs.ForEach(l => l.LogWarning(message, includeStackTrace, source));
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogError(string message, bool includeStackTrace = true)
+    public void LogError(string message,
+                         bool includeStackTrace = true,
+                         string source = null)
     {
-      _logs.ForEach(l => l.LogError(message, includeStackTrace));
+      _logs.ForEach(l => l.LogError(message, includeStackTrace, source));
     }
 
     //---------------------------------------------------------------------------------------------

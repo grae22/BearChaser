@@ -4,10 +4,10 @@
   {
     //---------------------------------------------------------------------------------------------
 
-    void LogDebug(string message, bool includeStackTrace = false);
-    void LogInfo(string message, bool includeStackTrace = false);
-    void LogWarning(string message, bool includeStackTrace = false);
-    void LogError(string message, bool includeStackTrace = true);
+    void LogDebug(string message, bool includeStackTrace = false, string source = null);
+    void LogInfo(string message, bool includeStackTrace = false, string source = null);
+    void LogWarning(string message, bool includeStackTrace = false, string source = null);
+    void LogError(string message, bool includeStackTrace = true, string source = null);
 
     //---------------------------------------------------------------------------------------------
   }

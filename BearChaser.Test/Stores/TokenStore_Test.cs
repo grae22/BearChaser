@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.Entity;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NSubstitute;
@@ -7,6 +7,7 @@ using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
 using BearChaser.Utils;
+using BearChaser.Utils.Logging;
 
 namespace BearChaser.Test.Stores
 {
@@ -20,11 +21,11 @@ namespace BearChaser.Test.Stores
     public async Task GetNewTokenAsync_GivenNothing_ShouldReturnValidGuid()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
       var settings = Substitute.For<ITokenSettings>();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var dbSaveMethod = new Func<Task>(async () => await Task.Delay(0));
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       // Act.
       Token token = await testObject.GetNewTokenAsync();
@@ -40,7 +41,7 @@ namespace BearChaser.Test.Stores
     public async Task GetNewTokenAsync_GivenTokenLifetimeOfFiveMins_ShouldReturnTokenWithFutureExpiryDate()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
 
       var settings = Substitute.For<ITokenSettings>();
       settings.TokenLifetimeInMinutes.Returns(5);
@@ -48,8 +49,9 @@ namespace BearChaser.Test.Stores
       var dateTimeSource = Substitute.For<IDateTimeSource>();
       dateTimeSource.Now.Returns(DateTime.Now);
 
+      var log = Substitute.For<ILogger>();
       var dbSaveMethod = new Func<Task>(async () => await Task.Delay(0));
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       // Act.
       Token token = await testObject.GetNewTokenAsync();
@@ -65,20 +67,18 @@ namespace BearChaser.Test.Stores
     public async Task GetNewTokenAsync_GivenNothing_ShouldSaveNewTokenToDb()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
       var settings = Substitute.For<ITokenSettings>();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var dbSaveCalled = false;
-      var dbSaveMethod = new Func<Task>(async () => { dbSaveCalled = true; await Task.Delay(0); });
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       // Act.
       Token token = await testObject.GetNewTokenAsync();
 
       // Assert.
-      tokensInDb.Received().Add(token);
-
-      Assert.True(dbSaveCalled);
+      tokensDb.Received().AddToken(token);
+      await tokensDb.Received().SaveAsync();
     }
 
     //---------------------------------------------------------------------------------------------
@@ -87,11 +87,11 @@ namespace BearChaser.Test.Stores
     public void IsTokenValid_GivenUnexpiredToken_ShouldReturnTrue()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
       var settings = Substitute.For<ITokenSettings>();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var dbSaveMethod = new Func<Task>(async () => await Task.Delay(0));
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       var token = new Token
       {
@@ -111,11 +111,11 @@ namespace BearChaser.Test.Stores
     public void IsTokenValid_GivenExpiredToken_ShouldReturnFalse()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
       var settings = Substitute.For<ITokenSettings>();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var dbSaveMethod = new Func<Task>(async () => await Task.Delay(0));
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       dateTimeSource.Now.Returns(DateTime.Now);
 
@@ -137,17 +137,54 @@ namespace BearChaser.Test.Stores
     public void IsTokenValid_GivenNullToken_ShouldReturnFalse()
     {
       // Arrange.
-      var tokensInDb = Substitute.For<IDbSet<Token>>();
+      var tokensDb = Substitute.For<ITokenDb>();
       var settings = Substitute.For<ITokenSettings>();
       var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var dbSaveMethod = new Func<Task>(async () => await Task.Delay(0));
-      var testObject = new TokenStore(tokensInDb, settings, dateTimeSource, dbSaveMethod);
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
 
       // Act.
       bool isValid = testObject.IsTokenValid(null);
 
       // Assert.
       Assert.False(isValid);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    [Ignore("Pending update to null the user table's token foreign key.")]
+    public async Task DeleteExpiredTokens_GivenExpiredAndValidTokens_ShouldDeleteTheExpiredTokens()
+    {
+      // Arrange.
+      var tokensDb = Substitute.For<ITokenDb>();
+      var settings = Substitute.For<ITokenSettings>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
+
+      dateTimeSource.Now.Returns(DateTime.Now);
+
+      var validToken = new Token { Expiry = dateTimeSource.Now.AddMilliseconds(1) };
+      var expiredToken1 = new Token { Expiry = dateTimeSource.Now.AddMilliseconds(-1) };
+      var expiredToken2 = new Token { Expiry = dateTimeSource.Now };
+
+      tokensDb.GetTokens().GetEnumerator().Returns(
+        new List<Token>
+        {
+          expiredToken2,
+          validToken,
+          expiredToken1
+        }
+        .GetEnumerator());
+      
+      // Act.
+      await testObject.GetNewTokenAsync();
+
+      // Assert.
+      tokensDb.Received(0).RemoveToken(validToken);
+      tokensDb.Received(1).RemoveToken(expiredToken1);
+      tokensDb.Received(1).RemoveToken(expiredToken2);
     }
 
     //---------------------------------------------------------------------------------------------

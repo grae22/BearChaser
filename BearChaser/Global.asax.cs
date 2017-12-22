@@ -45,10 +45,13 @@ namespace BearChaser
 
       // Types.
       controllerFactory.RegisterType<IUserStore, UserStore>();
+      controllerFactory.RegisterType<ITokenDb, ApplicationDbContext>();
+      controllerFactory.RegisterType<ITokenStore, TokenStore>();
 
       // Instances.
       controllerFactory.RegisterInstance<IDateTimeSource, DateTimeSource>(new DateTimeSource());
       controllerFactory.RegisterInstance<IUserSettings, AllSettings>(settings);
+      controllerFactory.RegisterInstance<ITokenSettings, AllSettings>(settings);
       controllerFactory.RegisterInstance<ILogger, Log>(log);
 
       ControllerBuilder.Current.SetControllerFactory(controllerFactory);

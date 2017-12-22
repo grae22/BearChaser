@@ -1,11 +1,9 @@
-﻿// TODO: Something needs to clear out expired tokens from time to time.
-
-using System;
-using System.Data.Entity;
+﻿using System;
 using System.Threading.Tasks;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Utils;
+using BearChaser.Utils.Logging;
 
 namespace BearChaser.Stores
 {
@@ -13,21 +11,21 @@ namespace BearChaser.Stores
   {
     //---------------------------------------------------------------------------------------------
 
-    private readonly IDbSet<Token> _tokens;
+    private readonly ITokenDb _tokenDb;
     private readonly IDateTimeSource _dateTimeSource;
-    private readonly Func<Task> _saveAction;
+    private readonly ILogger _log;
     private readonly int _tokenLifetimeInMinutes;
 
     //---------------------------------------------------------------------------------------------
 
-    public TokenStore(IDbSet<Token> tokens,
+    public TokenStore(ITokenDb tokenDb,
                       ITokenSettings settings,
                       IDateTimeSource dateTimeSource,
-                      Func<Task> saveAction)
+                      ILogger log)
     {
-      _tokens = tokens;
+      _tokenDb = tokenDb;
       _dateTimeSource = dateTimeSource;
-      _saveAction = saveAction;
+      _log = log;
       _tokenLifetimeInMinutes = settings.TokenLifetimeInMinutes;
     }
 
@@ -41,9 +39,11 @@ namespace BearChaser.Stores
         Expiry = _dateTimeSource.Now.AddMinutes(_tokenLifetimeInMinutes)
       };
 
-      _tokens.Add(token);
+      _tokenDb.AddToken(token);
 
       await SaveToDbAsync();
+
+      _log.LogInfo($"Issued token {token}.");
 
       return token;
     }
@@ -64,9 +64,32 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
     
-    private Task SaveToDbAsync()
+    private async Task SaveToDbAsync()
     {
-      return _saveAction.Invoke();
+      MarkExpiredTokensForDelete();
+      await _tokenDb.SaveAsync();
+
+      _log.LogDebug("TokenStore wrote to db.");
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    private void MarkExpiredTokensForDelete()
+    {
+      // TODO: User table foreign key needs to be nulled - introduce a SP?
+      //DateTime now = _dateTimeSource.Now;
+
+      //foreach (var token in _tokenDb.GetTokens())
+      //{
+      //  if (token.Expiry > now)
+      //  {
+      //    continue;
+      //  }
+
+      //  _tokenDb.RemoveToken(token);
+
+      //  _log.LogInfo($"Removed expired token {token}.");
+      //}
     }
 
     //---------------------------------------------------------------------------------------------

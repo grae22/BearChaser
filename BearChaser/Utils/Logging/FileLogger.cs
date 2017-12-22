@@ -27,30 +27,38 @@ namespace BearChaser.Utils.Logging
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogDebug(string message, bool includeStackTrace = false)
+    public void LogDebug(string message,
+                         bool includeStackTrace = false,
+                         string source = null)
     {
-      LogMessage("Debug", message, includeStackTrace);
+      LogMessage("Debug", message, includeStackTrace, source);
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogInfo(string message, bool includeStackTrace = false)
+    public void LogInfo(string message,
+                        bool includeStackTrace = false,
+                        string source = null)
     {
-      LogMessage("Info", message, includeStackTrace);
+      LogMessage("Info", message, includeStackTrace, source);
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogWarning(string message, bool includeStackTrace = false)
+    public void LogWarning(string message,
+                           bool includeStackTrace = false,
+                           string source = null)
     {
-      LogMessage("Warning", message, includeStackTrace);
+      LogMessage("Warning", message, includeStackTrace, source);
     }
 
     //---------------------------------------------------------------------------------------------
 
-    public void LogError(string message, bool includeStackTrace = true)
+    public void LogError(string message,
+                         bool includeStackTrace = true,
+                         string source = null)
     {
-      LogMessage("Error", message, includeStackTrace);
+      LogMessage("Error", message, includeStackTrace, source);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -74,7 +82,10 @@ namespace BearChaser.Utils.Logging
 
     //---------------------------------------------------------------------------------------------
 
-    private void LogMessage(string category, string message, bool includeStackTrace)
+    private void LogMessage(string category,
+                            string message,
+                            bool includeStackTrace,
+                            string source)
     {
       try
       {
@@ -85,7 +96,7 @@ namespace BearChaser.Utils.Logging
 
         lock (_writeToFileLock)
         {
-          _writer.WriteLine($"{DateTime.Now:u} | {category} | {message} |");
+          _writer.WriteLine($"{DateTime.Now:u} | {category} | {source} | {message} |");
 
           if (includeStackTrace)
           {

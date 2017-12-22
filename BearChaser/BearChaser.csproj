@@ -244,6 +244,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\ITokenDb.cs" />
     <Compile Include="Models\Token.cs" />
     <Compile Include="Settings\AllSettings.cs" />
     <Compile Include="Settings\ILogSettings.cs" />

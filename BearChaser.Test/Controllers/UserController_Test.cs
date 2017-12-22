@@ -28,7 +28,7 @@ namespace BearChaser.Test.Controllers
       var tokenStore = Substitute.For<ITokenStore>();
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Register("  ", "password");
@@ -55,7 +55,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "password");
@@ -82,7 +82,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "1234567");
@@ -109,7 +109,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Register("username", "12345678");
@@ -143,10 +143,9 @@ namespace BearChaser.Test.Controllers
       tokenStore.IsTokenValid(Arg.Any<Token>()).Returns(true);
 
       var userSettings = CreateUserSettings();
-      var dateTimeSource = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, dateTimeSource, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", "CorrectPassword");
@@ -172,7 +171,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", string.Empty);
@@ -203,7 +202,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, null, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       ActionResult result = await testObject.Login("username", "IncorrectPassword");
@@ -234,10 +233,9 @@ namespace BearChaser.Test.Controllers
       tokenStore.GetNewTokenAsync().Returns(new Token());
 
       var userSettings = CreateUserSettings();
-      var dateTimeSource = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, dateTimeSource, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
@@ -253,8 +251,6 @@ namespace BearChaser.Test.Controllers
     {
       // Arrange.
       var token = Guid.NewGuid();
-      var now = Substitute.For<IDateTimeSource>();
-      now.Now.Returns(DateTime.Now);
 
       var user = new User
       {
@@ -274,7 +270,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, now, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
@@ -290,16 +286,13 @@ namespace BearChaser.Test.Controllers
     {
       // Arrange.
       var token = Guid.NewGuid();
-      var now = Substitute.For<IDateTimeSource>();
-      now.Now.Returns(DateTime.Now);
 
       var user = new User
       {
         Password = "CorrectPassword".GetAsPasswordHash(),
         Token = new Token
         {
-          Value = token,
-          Expiry = now.Now.AddMilliseconds(-1)
+          Value = token
         }
       };
 
@@ -312,7 +305,7 @@ namespace BearChaser.Test.Controllers
       var userSettings = CreateUserSettings();
       var log = Substitute.For<ILogger>();
 
-      var testObject = new UserController(userStore, tokenStore, userSettings, now, log);
+      var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
       await testObject.Login("username", "CorrectPassword");
