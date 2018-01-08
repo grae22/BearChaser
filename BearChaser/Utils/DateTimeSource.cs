@@ -8,7 +8,7 @@ namespace BearChaser.Utils
     {
       get
       {
-        return DateTime.Now;
+        return DateTime.UtcNow;
       }
     }
   }

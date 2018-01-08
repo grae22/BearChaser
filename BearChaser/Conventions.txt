@@ -1,0 +1,1 @@
+﻿x All internal date handling should use UTC dates.

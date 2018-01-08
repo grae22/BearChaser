@@ -241,7 +241,8 @@ namespace BearChaser.Test.Controllers
       await testObject.Login("username", "CorrectPassword");
 
       // Assert.
-      Assert.NotNull(user.Token);
+
+      Assert.NotNull(user.TokenId);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -308,10 +309,13 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      await testObject.Login("username", "CorrectPassword");
+      var result = await testObject.Login("username", "CorrectPassword");
 
       // Assert.
-      Assert.AreNotEqual(token, user.Token.Value);
+      var jsonResult = result as JsonResult;
+      var returnedToken = JsonConvert.DeserializeObject<Guid>(jsonResult.Data as string);
+
+      Assert.AreNotEqual(token, returnedToken);
     }
 
     //=============================================================================================

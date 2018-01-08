@@ -35,6 +35,13 @@ namespace BearChaser.Models
 
     //---------------------------------------------------------------------------------------------
 
+    public async Task RemoveExpiredTokensAsync()
+    {
+      await Database.ExecuteSqlCommandAsync("EXEC sp_RemoveExpiredTokens");
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     public async Task SaveAsync()
     {
       await SaveChangesAsync();

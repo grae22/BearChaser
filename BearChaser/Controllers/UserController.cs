@@ -120,13 +120,14 @@ namespace BearChaser.Controllers
         return user.Token.Value;
       }
 
-      user.Token = await _tokenStore.GetNewTokenAsync();
+      Token token = await _tokenStore.GetNewTokenAsync();
+      user.TokenId = token.Id;
 
       await _userStore.SaveAsync();
 
-      _log.LogDebug($"Allocated token for user '{user.Username}'. {user.Token}");
+      _log.LogDebug($"Allocated token for user '{user.Username}'. {token}");
 
-      return user.Token.Value;
+      return token.Value;
     }
 
     //---------------------------------------------------------------------------------------------

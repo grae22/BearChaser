@@ -66,30 +66,10 @@ namespace BearChaser.Stores
     
     private async Task SaveToDbAsync()
     {
-      MarkExpiredTokensForDelete();
+      await _tokenDb.RemoveExpiredTokensAsync();
       await _tokenDb.SaveAsync();
 
       _log.LogDebug("TokenStore wrote to db.");
-    }
-
-    //---------------------------------------------------------------------------------------------
-
-    private void MarkExpiredTokensForDelete()
-    {
-      // TODO: User table foreign key needs to be nulled - introduce a SP?
-      //DateTime now = _dateTimeSource.Now;
-
-      //foreach (var token in _tokenDb.GetTokens())
-      //{
-      //  if (token.Expiry > now)
-      //  {
-      //    continue;
-      //  }
-
-      //  _tokenDb.RemoveToken(token);
-
-      //  _log.LogInfo($"Removed expired token {token}.");
-      //}
     }
 
     //---------------------------------------------------------------------------------------------

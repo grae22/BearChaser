@@ -10,6 +10,7 @@ namespace BearChaser.Models
     void AddToken(Token token);
     void RemoveToken(Token token);
     IEnumerable<Token> GetTokens();
+    Task RemoveExpiredTokensAsync();
     Task SaveAsync();
 
     //---------------------------------------------------------------------------------------------
