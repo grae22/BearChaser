@@ -246,8 +246,17 @@
     <Compile Include="Migrations\201801081250354_AddingRemoveExpiredTokensSp.Designer.cs">
       <DependentUpon>201801081250354_AddingRemoveExpiredTokensSp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801091314525_AddedGoalModel.cs" />
+    <Compile Include="Migrations\201801091314525_AddedGoalModel.Designer.cs">
+      <DependentUpon>201801091314525_AddedGoalModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801091318308_AddedUserToGoalModel.cs" />
+    <Compile Include="Migrations\201801091318308_AddedUserToGoalModel.Designer.cs">
+      <DependentUpon>201801091318308_AddedUserToGoalModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Goal.cs" />
     <Compile Include="Models\ITokenDb.cs" />
     <Compile Include="Models\Token.cs" />
     <Compile Include="Settings\AllSettings.cs" />
@@ -364,6 +373,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801081250354_AddingRemoveExpiredTokensSp.resx">
       <DependentUpon>201801081250354_AddingRemoveExpiredTokensSp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801091314525_AddedGoalModel.resx">
+      <DependentUpon>201801091314525_AddedGoalModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801091318308_AddedUserToGoalModel.resx">
+      <DependentUpon>201801091318308_AddedUserToGoalModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
