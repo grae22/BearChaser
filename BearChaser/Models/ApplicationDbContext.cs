@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
@@ -32,6 +33,13 @@ namespace BearChaser.Models
     public IEnumerable<Token> GetTokens()
     {
       return Tokens;
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<Token> GetTokenAsync(Guid guid)
+    {
+      return await Tokens.FirstOrDefaultAsync(t => t.Value == guid);
     }
 
     //---------------------------------------------------------------------------------------------

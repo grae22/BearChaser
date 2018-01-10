@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BearChaser.Models;
 
 namespace BearChaser.Stores
@@ -8,6 +9,7 @@ namespace BearChaser.Stores
     //---------------------------------------------------------------------------------------------
 
     Task<Token> GetNewTokenAsync();
+    Task<Token> GetExistingTokenByGuidAsync(Guid guid);
     bool IsTokenValid(Token token);
 
     //---------------------------------------------------------------------------------------------

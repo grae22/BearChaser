@@ -254,6 +254,10 @@
     <Compile Include="Migrations\201801091318308_AddedUserToGoalModel.Designer.cs">
       <DependentUpon>201801091318308_AddedUserToGoalModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801101022470_TokenValueMadeUnique.cs" />
+    <Compile Include="Migrations\201801101022470_TokenValueMadeUnique.Designer.cs">
+      <DependentUpon>201801101022470_TokenValueMadeUnique.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Goal.cs" />
@@ -379,6 +383,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801091318308_AddedUserToGoalModel.resx">
       <DependentUpon>201801091318308_AddedUserToGoalModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801101022470_TokenValueMadeUnique.resx">
+      <DependentUpon>201801101022470_TokenValueMadeUnique.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

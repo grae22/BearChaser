@@ -62,7 +62,7 @@ namespace BearChaser.Test.Stores
     }
 
     //---------------------------------------------------------------------------------------------
-
+    
     [Test]
     public async Task GetNewTokenAsync_GivenNothing_ShouldSaveNewTokenToDb()
     {
@@ -79,6 +79,70 @@ namespace BearChaser.Test.Stores
       // Assert.
       tokensDb.Received().AddToken(token);
       await tokensDb.Received().SaveAsync();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetNewTokenAsync_GivenNewTokenIssued_ShouldDeleteExpiredTokens()
+    {
+      // Arrange.
+      var tokensDb = Substitute.For<ITokenDb>();
+      var settings = Substitute.For<ITokenSettings>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
+
+      // Act.
+      await testObject.GetNewTokenAsync();
+
+      // Assert.
+      await tokensDb.Received(1).RemoveExpiredTokensAsync();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetExistingTokenByGuidAsync_GivenMatchingTokenExists_ShouldReturnToken()
+    {
+      // Arrange.
+      var guid = Guid.NewGuid();
+      var token = new Token { Id = 2, Value = guid };
+      var tokensDb = Substitute.For<ITokenDb>();
+      var settings = Substitute.For<ITokenSettings>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
+
+      tokensDb.GetTokenAsync(guid).Returns(token);
+
+      // Act.
+      Token returnedToken = await testObject.GetExistingTokenByGuidAsync(guid);
+
+      // Assert.
+      Assert.AreSame(token, returnedToken);
+    }
+
+    //---------------------------------------------------------------------------------------------
+    
+    [Test]
+    public async Task GetExistingTokenByGuidAsync_GivenNoMatchingTokenExists_ShouldReturnNull()
+    {
+      // Arrange.
+      var guid = Guid.NewGuid();
+      var tokensDb = Substitute.For<ITokenDb>();
+      var settings = Substitute.For<ITokenSettings>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
+
+      tokensDb.GetTokenAsync(guid).Returns((Token)null);
+
+      // Act.
+      Token token = await testObject.GetExistingTokenByGuidAsync(guid);
+
+      // Assert.
+      Assert.Null(token);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -148,43 +212,6 @@ namespace BearChaser.Test.Stores
 
       // Assert.
       Assert.False(isValid);
-    }
-
-    //---------------------------------------------------------------------------------------------
-
-    [Test]
-    [Ignore("Pending update to null the user table's token foreign key.")]
-    public async Task DeleteExpiredTokens_GivenExpiredAndValidTokens_ShouldDeleteTheExpiredTokens()
-    {
-      // Arrange.
-      var tokensDb = Substitute.For<ITokenDb>();
-      var settings = Substitute.For<ITokenSettings>();
-      var dateTimeSource = Substitute.For<IDateTimeSource>();
-      var log = Substitute.For<ILogger>();
-      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
-
-      dateTimeSource.Now.Returns(DateTime.Now);
-
-      var validToken = new Token { Expiry = dateTimeSource.Now.AddMilliseconds(1) };
-      var expiredToken1 = new Token { Expiry = dateTimeSource.Now.AddMilliseconds(-1) };
-      var expiredToken2 = new Token { Expiry = dateTimeSource.Now };
-
-      tokensDb.GetTokens().GetEnumerator().Returns(
-        new List<Token>
-        {
-          expiredToken2,
-          validToken,
-          expiredToken1
-        }
-        .GetEnumerator());
-      
-      // Act.
-      await testObject.GetNewTokenAsync();
-
-      // Assert.
-      tokensDb.Received(0).RemoveToken(validToken);
-      tokensDb.Received(1).RemoveToken(expiredToken1);
-      tokensDb.Received(1).RemoveToken(expiredToken2);
     }
 
     //---------------------------------------------------------------------------------------------

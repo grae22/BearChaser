@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace BearChaser.Models
@@ -8,7 +9,10 @@ namespace BearChaser.Models
     //---------------------------------------------------------------------------------------------
 
     public int Id { get; set; }
+
+    [Index(IsUnique = true)]
     public Guid Value { get; set; }
+
     public DateTime Expiry { get; set; } = new DateTime(2000, 1, 1);
 
     //---------------------------------------------------------------------------------------------
