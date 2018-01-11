@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Mvc;
+using System.Web.Http;
+using System.Web.Http.Results;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using NSubstitute;
 using BearChaser.Controllers;
+using BearChaser.Controllers.Requests;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
@@ -31,18 +32,22 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Register("  ", "password");
+      IHttpActionResult result = await testObject.Register(
+        new RegisterRequest
+        {
+          username = "  ",
+          password = "password"
+        });
 
-      var httpStatusCodeResult = result as HttpStatusCodeResult;
+      var badRequestResult = result as BadRequestErrorMessageResult;
 
       // Assert.
-      Assert.NotNull(httpStatusCodeResult);
-      Assert.AreEqual((int)HttpStatusCode.BadRequest, httpStatusCodeResult.StatusCode);
-      Assert.AreEqual("Username can't be blank.", httpStatusCodeResult.StatusDescription);
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("Username can't be blank.", badRequestResult.Message);
     }
 
     //---------------------------------------------------------------------------------------------
-
+    
     [Test]
     public async Task Register_GivenUsernameThatAlreadyExists_ShouldReturnBadRequest()
     {
@@ -58,16 +63,20 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Register("username", "password");
+      IHttpActionResult result = await testObject.Register(
+        new RegisterRequest
+        {
+          username = "username",
+          password = "password"
+        });
 
-      var httpStatusCodeResult = result as HttpStatusCodeResult;
+      var badRequestResult = result as BadRequestErrorMessageResult;
 
       // Assert.
-      Assert.NotNull(httpStatusCodeResult);
-      Assert.AreEqual((int)HttpStatusCode.BadRequest, httpStatusCodeResult.StatusCode);
-      Assert.AreEqual("Username already exists.", httpStatusCodeResult.StatusDescription);
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("Username already exists.", badRequestResult.Message);
     }
-
+    
     //---------------------------------------------------------------------------------------------
 
     [Test]
@@ -85,16 +94,20 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Register("username", "1234567");
+      IHttpActionResult result = await testObject.Register(
+        new RegisterRequest
+        {
+          username = "username",
+          password = "1234567"
+        });
 
-      var httpStatusCodeResult = result as HttpStatusCodeResult;
+      var badRequestResult = result as BadRequestErrorMessageResult;
 
       // Assert.
-      Assert.NotNull(httpStatusCodeResult);
-      Assert.AreEqual((int)HttpStatusCode.BadRequest, httpStatusCodeResult.StatusCode);
-      Assert.AreEqual("Password must be 8 or more characters long.", httpStatusCodeResult.StatusDescription);
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("Password must be 8 or more characters long.", badRequestResult.Message);
     }
-
+    
     //---------------------------------------------------------------------------------------------
 
     [Test]
@@ -112,16 +125,20 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Register("username", "12345678");
+      IHttpActionResult result = await testObject.Register(
+        new RegisterRequest
+        {
+          username = "username",
+          password = "12345678"
+        });
 
-      var httpStatusCodeResult = result as HttpStatusCodeResult;
+      var okResult = result as OkNegotiatedContentResult<string>;
 
       // Assert.
-      Assert.NotNull(httpStatusCodeResult);
-      Assert.AreEqual((int)HttpStatusCode.OK, httpStatusCodeResult.StatusCode);
-      Assert.AreEqual("User registered.", httpStatusCodeResult.StatusDescription);
+      Assert.NotNull(okResult);
+      Assert.AreEqual("User registered.", okResult.Content);
     }
-
+    
     //---------------------------------------------------------------------------------------------
     
     [Test]
@@ -148,15 +165,20 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Login("username", "CorrectPassword");
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = "CorrectPassword"
+        });
 
-      var jsonResult = result as JsonResult;
-      var returnedToken = JsonConvert.DeserializeObject<Guid>(jsonResult.Data as string);
+      var jsonResult = result as OkNegotiatedContentResult<string>;
+      var returnedToken = JsonConvert.DeserializeObject<Guid>(jsonResult.Content);
 
       // Assert.
       Assert.AreEqual(tokenValue, returnedToken);
     }
-
+    
     //---------------------------------------------------------------------------------------------
 
     [Test]
@@ -174,17 +196,21 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Login("username", string.Empty);
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = string.Empty
+        });
 
       // Assert.
-      var httpNotFoundResult = result as HttpNotFoundResult;
+      var httpNotFoundResult = result as NotFoundResult;
 
       Assert.NotNull(httpNotFoundResult);
-      StringAssert.Contains("username", httpNotFoundResult.StatusDescription);
     }
 
     //---------------------------------------------------------------------------------------------
-
+    
     [Test]
     public async Task Login_GivenIncorrectPassword_ShouldReturnAuthenticationError()
     {
@@ -205,16 +231,19 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      ActionResult result = await testObject.Login("username", "IncorrectPassword");
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = "IncorrectPassword"
+        });
 
       // Assert.
-      var httpStatusCodeResult = result as HttpStatusCodeResult;
+      var httpStatusCodeResult = result as UnauthorizedResult;
 
       Assert.NotNull(httpStatusCodeResult);
-      Assert.AreEqual((int)HttpStatusCode.Forbidden, httpStatusCodeResult.StatusCode);
-      Assert.AreEqual("Invalid password.", httpStatusCodeResult.StatusDescription);
     }
-
+    
     //---------------------------------------------------------------------------------------------
 
     [Test]
@@ -238,13 +267,17 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      await testObject.Login("username", "CorrectPassword");
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = "CorrectPassword"
+        });
 
       // Assert.
-
       Assert.NotNull(user.TokenId);
     }
-
+    
     //---------------------------------------------------------------------------------------------
 
     [Test]
@@ -274,7 +307,12 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      await testObject.Login("username", "CorrectPassword");
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = "CorrectPassword"
+        });
 
       // Assert.
       Assert.AreEqual(token, user.Token.Value);
@@ -309,15 +347,20 @@ namespace BearChaser.Test.Controllers
       var testObject = new UserController(userStore, tokenStore, userSettings, log);
 
       // Act.
-      var result = await testObject.Login("username", "CorrectPassword");
+      IHttpActionResult result = await testObject.Login(
+        new LoginRequest
+        {
+          username = "username",
+          password = "CorrectPassword"
+        });
 
       // Assert.
-      var jsonResult = result as JsonResult;
-      var returnedToken = JsonConvert.DeserializeObject<Guid>(jsonResult.Data as string);
+      var jsonResult = result as OkNegotiatedContentResult<string>;
+      var returnedToken = JsonConvert.DeserializeObject<Guid>(jsonResult.Content);
 
       Assert.AreNotEqual(token, returnedToken);
     }
-
+    
     //=============================================================================================
 
     private static IUserSettings CreateUserSettings()

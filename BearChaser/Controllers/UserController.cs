@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using System.Web.Mvc;
+using System.Web.Http;
 using Newtonsoft.Json;
+using BearChaser.Controllers.Requests;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
@@ -12,7 +12,7 @@ using BearChaser.Utils.Logging;
 
 namespace BearChaser.Controllers
 {
-  public class UserController : Controller
+  public class UserController : ApiController
   {
     //---------------------------------------------------------------------------------------------
 
@@ -37,28 +37,27 @@ namespace BearChaser.Controllers
     //---------------------------------------------------------------------------------------------
 
     [HttpPost]
-    public async Task<ActionResult> Register(string username, string password)
+    [Route("api/user/register")]
+    public async Task<IHttpActionResult> Register(RegisterRequest request)
     {
-      username = username ?? string.Empty;
-      password = password ?? string.Empty;
+      var username = request.username ?? string.Empty;
+      var password = request.password ?? string.Empty;
 
       username = username.Trim();
 
       if (username.Any() == false)
       {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Username can't be blank.");
+        return BadRequest("Username can't be blank.");
       }
 
       if (await _userStore.GetUserAsync(username) != null)
       {
-        return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Username already exists.");
+        return BadRequest("Username already exists.");
       }
 
       if (password.Length < _userSettings.UserPasswordMinLength)
       {
-        return new HttpStatusCodeResult(
-          HttpStatusCode.BadRequest,
-          $"Password must be {_userSettings.UserPasswordMinLength} or more characters long.");
+        return BadRequest($"Password must be {_userSettings.UserPasswordMinLength} or more characters long.");
       }
 
       int passwordHash = password.GetAsPasswordHash();
@@ -67,39 +66,37 @@ namespace BearChaser.Controllers
 
       _log.LogInfo($"User '{username}' registered.");
 
-      return new HttpStatusCodeResult(HttpStatusCode.OK, "User registered.");
+      return Ok("User registered.");
     }
 
     //---------------------------------------------------------------------------------------------
 
     [HttpPost]
-    public async Task<ActionResult> Login(string username, string password)
+    [Route("api/user/login")]
+    public async Task<IHttpActionResult> Login(LoginRequest request)
     {
-      username = username ?? string.Empty;
-      password = password ?? string.Empty;
+      var username = request.username ?? string.Empty;
+      var password = request.password ?? string.Empty;
 
       User user = await _userStore.GetUserAsync(username);
 
       if (user == null)
       {
-        return new HttpNotFoundResult($"Unknown username '{username}'.");
+        return NotFound();
       }
 
       int passwordHash = password.GetAsPasswordHash();
 
       if (ValidatePassword(passwordHash, user) == false)
       {
-        return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Invalid password.");
+        return Unauthorized();
       }
 
       Guid token = await AllocateTokenAsync(user);
 
       _log.LogDebug($"User '{username}' logged in.");
 
-      return new JsonResult
-      {
-        Data = JsonConvert.SerializeObject(token)
-      };
+      return Ok(JsonConvert.SerializeObject(token));
     }
 
     //---------------------------------------------------------------------------------------------
