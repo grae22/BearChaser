@@ -134,6 +134,7 @@ namespace BearChaser.Controllers
 
       if (Guid.TryParse(auth, out Guid userToken) == false)
       {
+        _log.LogDebug($"Invalid token format \"{auth}\".");
         throw new AuthenticationException("Invalid user token format.");
       }
 
@@ -141,6 +142,7 @@ namespace BearChaser.Controllers
 
       if (token == null)
       {
+        _log.LogDebug($"Token not found \"{auth}\".");
         throw new AuthenticationException("User token not found, it may have expired.");
       }
 

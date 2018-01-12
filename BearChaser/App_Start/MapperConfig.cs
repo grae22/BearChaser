@@ -8,9 +8,20 @@ namespace BearChaser
   {
     //---------------------------------------------------------------------------------------------
 
+    private static bool _isInitialised;
+
+    //---------------------------------------------------------------------------------------------
+
     public static void Initialise()
     {
+      if (_isInitialised)
+      {
+        return;
+      }
+
       Mapper.Initialize(cfg => cfg.CreateMap<Goal, GoalData>());
+
+      _isInitialised = true;
     }
 
     //---------------------------------------------------------------------------------------------
