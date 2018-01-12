@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NSubstitute;
+using BearChaser.Db;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;

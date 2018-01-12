@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
+using BearChaser.Db;
 using BearChaser.Models;
 
 namespace BearChaser.Stores

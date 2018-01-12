@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
+using BearChaser.Db;
 using Unity;
-using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
 using BearChaser.Utils;
@@ -43,6 +43,8 @@ namespace BearChaser
       container.RegisterType<ITokenStore, TokenStore>();
       container.RegisterType<IGoalDb, ApplicationDbContext>();
       container.RegisterType<IGoalStore, GoalStore>();
+      container.RegisterType<IGoalAttemptDb, ApplicationDbContext>();
+      container.RegisterType<IGoalAttemptStore, GoalAttemptStore>();
 
       // Instances.
       container.RegisterInstance<IDateTimeSource>(new DateTimeSource());

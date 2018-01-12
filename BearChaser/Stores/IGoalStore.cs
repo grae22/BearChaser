@@ -14,8 +14,8 @@ namespace BearChaser.Stores
                                int frequencyWithinPeriod);
 
     Task RemoveGoalAsync(Goal goal);
-
     Task<IEnumerable<Goal>> GetGoalsAsync(int userId);
+    Task<Goal> GetGoalAsync(int goalId);
 
     //---------------------------------------------------------------------------------------------
   }

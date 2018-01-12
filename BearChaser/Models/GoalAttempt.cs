@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace BearChaser.Models
 {
-  public class User
+  public class GoalAttempt
   {
     //---------------------------------------------------------------------------------------------
 
     public int Id { get; set; }
-    public string Username { get; set; }
-    public int Password { get; set; }
-    public int? TokenId { get; set; }
-    public virtual Token Token { get; set; }
+    public int GoalId { get; set; }
+    public virtual Goal Goal { get; set; }
+    public DateTime Timestamp { get; set; }
 
     //---------------------------------------------------------------------------------------------
 

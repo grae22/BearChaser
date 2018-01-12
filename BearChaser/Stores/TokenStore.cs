@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using BearChaser.Db;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Utils;

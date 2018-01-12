@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BearChaser.Models;
 
-namespace BearChaser.Models
+namespace BearChaser.Db
 {
   internal interface ITokenDb
   {

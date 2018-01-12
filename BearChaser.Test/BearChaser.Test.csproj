@@ -95,6 +95,7 @@
     <Compile Include="Controllers\GoalController_Test.cs" />
     <Compile Include="Controllers\UserController_Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stores\GoalAttemptStore_Test.cs" />
     <Compile Include="Stores\GoalStore_Test.cs" />
     <Compile Include="Stores\SettingsStore_Test.cs" />
     <Compile Include="Stores\TokenStore_Test.cs" />

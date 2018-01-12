@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Ajax.Utilities;
+using BearChaser.Db;
 using BearChaser.Models;
 
 namespace BearChaser.Stores
@@ -33,14 +34,13 @@ namespace BearChaser.Stores
       ValidatePeriod(period);
       ValidateFrequency(frequencyWithinPeriod);
 
-      var goal =
-        new Goal
-        {
-          Name = name,
-          UserId = userId,
-          Period = period,
-          FrequencyWithinPeriod = frequencyWithinPeriod
-        };
+      var goal = new Goal
+      {
+        Name = name,
+        UserId = userId,
+        Period = period,
+        FrequencyWithinPeriod = frequencyWithinPeriod
+      };
 
       _goalDb.AddGoal(goal);
 
@@ -62,6 +62,13 @@ namespace BearChaser.Stores
     public async Task<IEnumerable<Goal>> GetGoalsAsync(int userId)
     {
       return await _goalDb.GetGoalsAsync(userId);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<Goal> GetGoalAsync(int goalId)
+    {
+      return await _goalDb.GetGoalAsync(goalId);
     }
 
     //---------------------------------------------------------------------------------------------

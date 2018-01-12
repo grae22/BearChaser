@@ -83,7 +83,11 @@ namespace BearChaser.Controllers
       var goalDatas = new List<GoalData>();
       goals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
 
-      return Ok(JsonConvert.SerializeObject(goalDatas));
+      string serializeData = JsonConvert.SerializeObject(goalDatas);
+
+      _log.LogDebug($"Retrieved user's goals {serializeData}.");
+
+      return Ok(serializeData);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -107,12 +111,11 @@ namespace BearChaser.Controllers
         return InternalServerError();
       }
       
-      Goal goal =
-        await _goalStore.CreateGoalAsync(
-          user.Id,
-          goalData.Name,
-          (Goal.TimePeriod)goalData.Period,
-          goalData.FrequencyWithinPeriod);
+      Goal goal = await _goalStore.CreateGoalAsync(
+        user.Id,
+        goalData.Name,
+        (Goal.TimePeriod)goalData.Period,
+        goalData.FrequencyWithinPeriod);
 
       goalData.Id = goal.Id;
 
@@ -153,6 +156,8 @@ namespace BearChaser.Controllers
         _log.LogError($"User not found, but valid token exists: {token}");
         throw new InternalServerException();
       }
+
+      _log.LogDebug($"Found user \"{user.Username}\" for token {token}.");
 
       return user;
     }

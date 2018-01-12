@@ -2,14 +2,14 @@ namespace BearChaser.Migrations
 {
   using System.Data.Entity.Migrations;
 
-  internal sealed class Configuration : DbMigrationsConfiguration<BearChaser.Models.ApplicationDbContext>
+  internal sealed class Configuration : DbMigrationsConfiguration<BearChaser.Db.ApplicationDbContext>
   {
     public Configuration()
     {
       AutomaticMigrationsEnabled = false;
     }
 
-    protected override void Seed(BearChaser.Models.ApplicationDbContext context)
+    protected override void Seed(BearChaser.Db.ApplicationDbContext context)
     {
       //  This method will be called after migrating to the latest version.
 

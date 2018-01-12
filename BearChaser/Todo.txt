@@ -1,1 +1,2 @@
-﻿x Finish goal controller.
+﻿x Mechanism for renewing/replacing user token.
+x API method(s) to log effort towards goal.

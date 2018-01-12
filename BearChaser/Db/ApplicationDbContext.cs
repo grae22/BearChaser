@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using BearChaser.Models;
 
-namespace BearChaser.Models
+namespace BearChaser.Db
 {
-  internal class ApplicationDbContext : DbContext, ITokenDb, IGoalDb
+  internal class ApplicationDbContext : DbContext, ITokenDb, IGoalDb, IGoalAttemptDb
   {
     //---------------------------------------------------------------------------------------------
 
@@ -14,6 +15,7 @@ namespace BearChaser.Models
     public DbSet<User> Users { get; set; }
     public DbSet<Token> Tokens { get; set; }
     public DbSet<Goal> Goals { get; set; }
+    public DbSet<GoalAttempt> GoalAttempts { get; set; }
 
     // ITokenDb ===================================================================================
 
@@ -69,6 +71,34 @@ namespace BearChaser.Models
     public async Task<IEnumerable<Goal>> GetGoalsAsync(int userId)
     {
       return await Goals.Where(g => g.UserId == userId).ToListAsync();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<Goal> GetGoalAsync(int goalId)
+    {
+      return await Goals.FirstOrDefaultAsync(g => g.Id == goalId);
+    }
+
+    // IGoalAttemptDb =============================================================================
+
+    public void AddAttempt(GoalAttempt goal)
+    {
+      GoalAttempts.Add(goal);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public void RemoveAttempt(GoalAttempt goal)
+    {
+      GoalAttempts.Remove(goal);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId)
+    {
+      return await GoalAttempts.Where(g => g.GoalId == goalId).ToListAsync();
     }
 
     // Common =====================================================================================

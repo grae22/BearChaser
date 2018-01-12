@@ -94,7 +94,7 @@ namespace BearChaser.Controllers
 
       Guid token = await AllocateTokenAsync(user);
 
-      _log.LogDebug($"User '{username}' logged in.");
+      _log.LogDebug($"User logged in: {user}");
 
       return Ok(JsonConvert.SerializeObject(token));
     }

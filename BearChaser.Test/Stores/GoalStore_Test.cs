@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NSubstitute;
+using BearChaser.Db;
 using BearChaser.Models;
 using BearChaser.Stores;
 
@@ -154,6 +155,23 @@ namespace BearChaser.Test.Stores
 
       // Assert.
       await goalDb.Received(1).GetGoalsAsync(0);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetGoalAsync_GivenGoalId_ShouldQueryDb()
+    {
+      // Arrange.
+      var goalDb = Substitute.For<IGoalDb>();
+      var userStore = Substitute.For<IUserStore>();
+      var testObject = new GoalStore(goalDb, userStore);
+
+      // Act.
+      await testObject.GetGoalAsync(0);
+
+      // Assert.
+      await goalDb.Received(1).GetGoalAsync(0);
     }
 
     //---------------------------------------------------------------------------------------------
