@@ -5,13 +5,13 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Newtonsoft.Json;
+using WebGrease.Css.Extensions;
 using BearChaser.DataTransferObjects;
 using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
-using Newtonsoft.Json;
-using WebGrease.Css.Extensions;
 
 namespace BearChaser.Controllers
 {
@@ -114,9 +114,11 @@ namespace BearChaser.Controllers
           (Goal.TimePeriod)goalData.Period,
           goalData.FrequencyWithinPeriod);
 
+      goalData.Id = goal.Id;
+
       _log.LogDebug($"Goal created: {goal}");
 
-      return Ok();
+      return Ok(JsonConvert.SerializeObject(goalData));
     }
 
     //---------------------------------------------------------------------------------------------

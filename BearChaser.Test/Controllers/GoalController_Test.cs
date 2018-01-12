@@ -265,6 +265,8 @@ namespace BearChaser.Test.Controllers
     public async Task CreateGoalAsync_GivenValidParams_ShouldAddGoalToStore()
     {
       // Arrange.
+      MapperConfig.Initialise();
+
       var goalStore = Substitute.For<IGoalStore>();
       var userStore = Substitute.For<IUserStore>();
       var tokenStore = Substitute.For<ITokenStore>();
@@ -282,6 +284,19 @@ namespace BearChaser.Test.Controllers
       tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
       userStore.GetUserAsync(userToken).Returns(new User { Id = 123 });
 
+      var returnedGoal = new Goal
+      {
+        Id = 10,
+        UserId = 123,
+        Name = "NewGoal",
+        Period = (Goal.TimePeriod) 1,
+        FrequencyWithinPeriod = 2
+      };
+
+      var returnedGoalData = Mapper.Map<GoalData>(returnedGoal);
+
+      goalStore.CreateGoalAsync(123, "NewGoal", (Goal.TimePeriod)1, 2).Returns(returnedGoal);
+
       // Act.
       var result = await testObject.CreateGoalAsync(
         new GoalData
@@ -294,7 +309,10 @@ namespace BearChaser.Test.Controllers
       // Assert.
       await goalStore.Received(1).CreateGoalAsync(123, "NewGoal", (Goal.TimePeriod)1, 2);
 
-      Assert.IsInstanceOf<OkResult>(result);
+      var okResult = result as OkNegotiatedContentResult<string>;
+
+      Assert.NotNull(okResult);
+      Assert.AreEqual(JsonConvert.SerializeObject(returnedGoalData), okResult.Content);
     }
 
     //---------------------------------------------------------------------------------------------
