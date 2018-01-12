@@ -7,7 +7,7 @@ namespace BearChaser.Migrations
     public override void Up()
     {
       Sql("INSERT INTO dbo.Settings(Id, Value) VALUES ('UserPasswordMinLength', '8')");
-      Sql("INSERT INTO dbo.Settings(Id, Value) VALUES ('UserTokenLifetimeInMinutes', '5')");
+      Sql("INSERT INTO dbo.Settings(Id, Value) VALUES ('TokenLifetimeInMinutes', '5')");
     }
 
     public override void Down()

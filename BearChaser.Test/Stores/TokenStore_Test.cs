@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NSubstitute;
@@ -13,7 +12,7 @@ namespace BearChaser.Test.Stores
 {
   [TestFixture]
   [Category("TokenStore")]
-  public class TokenStore_Test
+  internal class TokenStore_Test
   {
     //---------------------------------------------------------------------------------------------
 
@@ -103,7 +102,7 @@ namespace BearChaser.Test.Stores
     //---------------------------------------------------------------------------------------------
 
     [Test]
-    public async Task GetExistingTokenByGuidAsync_GivenMatchingTokenExists_ShouldReturnToken()
+    public async Task GetExistingValidTokenByGuidAsync_GivenMatchingTokenExists_ShouldReturnToken()
     {
       // Arrange.
       var guid = Guid.NewGuid();
@@ -117,16 +116,42 @@ namespace BearChaser.Test.Stores
       tokensDb.GetTokenAsync(guid).Returns(token);
 
       // Act.
-      Token returnedToken = await testObject.GetExistingTokenByGuidAsync(guid);
+      Token returnedToken = await testObject.GetExistingValidTokenByGuidAsync(guid);
 
       // Assert.
       Assert.AreSame(token, returnedToken);
     }
 
     //---------------------------------------------------------------------------------------------
-    
+
     [Test]
-    public async Task GetExistingTokenByGuidAsync_GivenNoMatchingTokenExists_ShouldReturnNull()
+    public async Task GetExistingValidTokenByGuidAsync_GivenMatchingExpiredTokenExists_ShouldReturnNull()
+    {
+      // Arrange.
+      var now = DateTime.Now;
+      var guid = Guid.NewGuid();
+      var token = new Token { Id = 2, Value = guid, Expiry = now };
+      var tokensDb = Substitute.For<ITokenDb>();
+      var settings = Substitute.For<ITokenSettings>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new TokenStore(tokensDb, settings, dateTimeSource, log);
+
+      tokensDb.GetTokenAsync(guid).Returns(token);
+
+      dateTimeSource.Now.Returns(now.AddMilliseconds(1));
+
+      // Act.
+      Token returnedToken = await testObject.GetExistingValidTokenByGuidAsync(guid);
+
+      // Assert.
+      Assert.Null(returnedToken);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetExistingValidTokenByGuidAsync_GivenNoMatchingTokenExists_ShouldReturnNull()
     {
       // Arrange.
       var guid = Guid.NewGuid();
@@ -139,7 +164,7 @@ namespace BearChaser.Test.Stores
       tokensDb.GetTokenAsync(guid).Returns((Token)null);
 
       // Act.
-      Token token = await testObject.GetExistingTokenByGuidAsync(guid);
+      Token token = await testObject.GetExistingValidTokenByGuidAsync(guid);
 
       // Assert.
       Assert.Null(token);

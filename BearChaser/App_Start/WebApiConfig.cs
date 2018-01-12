@@ -41,6 +41,8 @@ namespace BearChaser
       container.RegisterType<IUserStore, UserStore>();
       container.RegisterType<ITokenDb, ApplicationDbContext>();
       container.RegisterType<ITokenStore, TokenStore>();
+      container.RegisterType<IGoalDb, ApplicationDbContext>();
+      container.RegisterType<IGoalStore, GoalStore>();
 
       // Instances.
       container.RegisterInstance<IDateTimeSource>(new DateTimeSource());

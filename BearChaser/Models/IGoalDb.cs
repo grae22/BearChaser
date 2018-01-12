@@ -1,16 +1,16 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BearChaser.Models;
 
-namespace BearChaser.Stores
+namespace BearChaser.Models
 {
-  public interface ITokenStore
+  internal interface IGoalDb
   {
     //---------------------------------------------------------------------------------------------
 
-    Task<Token> GetNewTokenAsync();
-    Task<Token> GetExistingValidTokenByGuidAsync(Guid guid);
-    bool IsTokenValid(Token token);
+    void AddGoal(Goal goal);
+    void RemoveGoal(Goal goal);
+    Task<IEnumerable<Goal>> GetGoalsAsync(int userId);
+    Task SaveAsync();
 
     //---------------------------------------------------------------------------------------------
   }

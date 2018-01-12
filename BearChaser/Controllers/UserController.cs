@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
-using BearChaser.Controllers.Requests;
+using BearChaser.DataTransferObjects;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
@@ -38,10 +38,10 @@ namespace BearChaser.Controllers
 
     [HttpPost]
     [Route("api/user/register")]
-    public async Task<IHttpActionResult> Register(RegisterRequest request)
+    public async Task<IHttpActionResult> Register(UserLoginData userLogin)
     {
-      var username = request.username ?? string.Empty;
-      var password = request.password ?? string.Empty;
+      var username = userLogin.Username ?? string.Empty;
+      var password = userLogin.Password ?? string.Empty;
 
       username = username.Trim();
 
@@ -73,10 +73,10 @@ namespace BearChaser.Controllers
 
     [HttpPost]
     [Route("api/user/login")]
-    public async Task<IHttpActionResult> Login(LoginRequest request)
+    public async Task<IHttpActionResult> Login(UserLoginData userLogin)
     {
-      var username = request.username ?? string.Empty;
-      var password = request.password ?? string.Empty;
+      var username = userLogin.Username ?? string.Empty;
+      var password = userLogin.Password ?? string.Empty;
 
       User user = await _userStore.GetUserAsync(username);
 

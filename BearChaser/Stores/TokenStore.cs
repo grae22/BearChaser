@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using BearChaser.Models;
 using BearChaser.Settings;
@@ -51,9 +50,16 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
 
-    public async Task<Token> GetExistingTokenByGuidAsync(Guid guid)
+    public async Task<Token> GetExistingValidTokenByGuidAsync(Guid guid)
     {
-      return await _tokenDb.GetTokenAsync(guid);
+      Token token = await _tokenDb.GetTokenAsync(guid);
+
+      if (IsTokenValid(token))
+      {
+        return token;
+      }
+
+      return null;
     }
 
     //---------------------------------------------------------------------------------------------

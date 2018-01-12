@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BearChaser.Models
 {
-  internal class ApplicationDbContext : DbContext, ITokenDb
+  internal class ApplicationDbContext : DbContext, ITokenDb, IGoalDb
   {
     //---------------------------------------------------------------------------------------------
 
@@ -14,7 +15,7 @@ namespace BearChaser.Models
     public DbSet<Token> Tokens { get; set; }
     public DbSet<Goal> Goals { get; set; }
 
-    //---------------------------------------------------------------------------------------------
+    // ITokenDb ===================================================================================
 
     public void AddToken(Token token)
     {
@@ -49,7 +50,28 @@ namespace BearChaser.Models
       await Database.ExecuteSqlCommandAsync("EXEC sp_RemoveExpiredTokens");
     }
 
+    // IGoalDb ====================================================================================
+
+    public void AddGoal(Goal goal)
+    {
+      Goals.Add(goal);
+    }
+
     //---------------------------------------------------------------------------------------------
+
+    public void RemoveGoal(Goal goal)
+    {
+      Goals.Remove(goal);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<IEnumerable<Goal>> GetGoalsAsync(int userId)
+    {
+      return await Goals.Where(g => g.UserId == userId).ToListAsync();
+    }
+
+    // Common =====================================================================================
 
     public async Task SaveAsync()
     {

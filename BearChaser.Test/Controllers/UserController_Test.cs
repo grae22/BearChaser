@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using NSubstitute;
 using BearChaser.Controllers;
-using BearChaser.Controllers.Requests;
+using BearChaser.DataTransferObjects;
 using BearChaser.Models;
 using BearChaser.Settings;
 using BearChaser.Stores;
@@ -33,10 +33,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Register(
-        new RegisterRequest
+        new UserLoginData
         {
-          username = "  ",
-          password = "password"
+          Username = "  ",
+          Password = "password"
         });
 
       var badRequestResult = result as BadRequestErrorMessageResult;
@@ -64,10 +64,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Register(
-        new RegisterRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "password"
+          Username = "username",
+          Password = "password"
         });
 
       var badRequestResult = result as BadRequestErrorMessageResult;
@@ -95,10 +95,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Register(
-        new RegisterRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "1234567"
+          Username = "username",
+          Password = "1234567"
         });
 
       var badRequestResult = result as BadRequestErrorMessageResult;
@@ -126,10 +126,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Register(
-        new RegisterRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "12345678"
+          Username = "username",
+          Password = "12345678"
         });
 
       var okResult = result as OkNegotiatedContentResult<string>;
@@ -166,10 +166,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "CorrectPassword"
+          Username = "username",
+          Password = "CorrectPassword"
         });
 
       var jsonResult = result as OkNegotiatedContentResult<string>;
@@ -197,10 +197,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = string.Empty
+          Username = "username",
+          Password = string.Empty
         });
 
       // Assert.
@@ -232,10 +232,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "IncorrectPassword"
+          Username = "username",
+          Password = "IncorrectPassword"
         });
 
       // Assert.
@@ -268,10 +268,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "CorrectPassword"
+          Username = "username",
+          Password = "CorrectPassword"
         });
 
       // Assert.
@@ -308,10 +308,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "CorrectPassword"
+          Username = "username",
+          Password = "CorrectPassword"
         });
 
       // Assert.
@@ -348,10 +348,10 @@ namespace BearChaser.Test.Controllers
 
       // Act.
       IHttpActionResult result = await testObject.Login(
-        new LoginRequest
+        new UserLoginData
         {
-          username = "username",
-          password = "CorrectPassword"
+          Username = "username",
+          Password = "CorrectPassword"
         });
 
       // Assert.

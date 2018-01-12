@@ -27,6 +27,13 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
 
+    public async Task<User> GetUserAsync(int userId)
+    {
+      return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
     public async Task AddUserAsync(string username, int passwordHash)
     {
       User user = await GetUserAsync(username);

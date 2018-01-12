@@ -1,1 +1,1 @@
-﻿x Goal store & controller.
+﻿x Finish goal controller.
