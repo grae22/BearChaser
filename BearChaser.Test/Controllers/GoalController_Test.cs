@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Http.Controllers;
 using System.Web.Http.Results;
+using AutoMapper;
 using NUnit.Framework;
 using NSubstitute;
+using Newtonsoft.Json;
 using BearChaser.Controllers;
 using BearChaser.DataTransferObjects;
 using BearChaser.Models;
@@ -90,6 +95,173 @@ namespace BearChaser.Test.Controllers
     //---------------------------------------------------------------------------------------------
 
     [Test]
+    public async Task GetGoalsAsync_GivenUserToken_ShouldReturnUsersGoals()
+    {
+      // Arrange.
+      MapperConfig.Initialise();
+
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+      var guid = Guid.NewGuid();
+      var userToken = new Token();
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
+      userStore.GetUserAsync(userToken).Returns(new User { Id = 123 });
+
+      var goals = new List<Goal>
+      {
+        new Goal
+        {
+          Id = 10,
+          UserId = 123,
+          Name = "Some Goal",
+          Period = Goal.TimePeriod.Day,
+          FrequencyWithinPeriod = 1
+        }
+      };
+
+      goalStore.GetGoalsAsync(123).Returns(goals);
+
+      // Act.
+      var result = await testObject.GetGoalsAsync();
+
+      // Assert.
+      var okResult = result as OkNegotiatedContentResult<string>;
+
+      var goalDatas = new List<GoalData>
+      {
+        Mapper.Map<GoalData>(goals[0])
+      };
+
+      Assert.NotNull(okResult);
+      Assert.AreEqual(JsonConvert.SerializeObject(goalDatas), okResult.Content);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetGoalsAsync_GivenNoUserToken_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+
+      // Act.
+      var result = await testObject.GetGoalsAsync();
+
+      // Assert.
+      var badRequestResult = result as BadRequestErrorMessageResult;
+
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("No token provided.", badRequestResult.Message);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetGoalsAsync_GivenInvalidUserToken_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", "Not A Guid");
+
+      // Act.
+      var result = await testObject.GetGoalsAsync();
+
+      // Assert.
+      var badRequestResult = result as BadRequestErrorMessageResult;
+
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("Invalid user token format.", badRequestResult.Message);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetGoalsAsync_GivenUserTokenWithNoMatchingToken_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+      var guid = Guid.NewGuid();
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns((Token)null);
+
+      // Act.
+      var result = await testObject.GetGoalsAsync();
+
+      // Assert.
+      var badRequestResult = result as BadRequestErrorMessageResult;
+
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("User token not found, it may have expired.", badRequestResult.Message);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetGoalsAsync_GivenValidParamsAndUserIsntFound_ShouldReturnServerError()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+      var guid = Guid.NewGuid();
+      var userToken = new Token();
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
+      userStore.GetUserAsync(userToken).Returns((User)null);
+
+      // Act.
+      var result = await testObject.GetGoalsAsync();
+
+      // Assert.
+      var serverErrorResult = result as InternalServerErrorResult;
+
+      Assert.NotNull(serverErrorResult);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
     public async Task CreateGoalAsync_GivenValidParams_ShouldAddGoalToStore()
     {
       // Arrange.
@@ -101,6 +273,12 @@ namespace BearChaser.Test.Controllers
       var guid = Guid.NewGuid();
       var userToken = new Token();
 
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
       tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
       userStore.GetUserAsync(userToken).Returns(new User { Id = 123 });
 
@@ -108,7 +286,6 @@ namespace BearChaser.Test.Controllers
       var result = await testObject.CreateGoalAsync(
         new GoalData
         {
-          UserToken = guid.ToString(),
           Name = "NewGoal",
           Period = 1,
           FrequencyWithinPeriod = 2
@@ -123,7 +300,7 @@ namespace BearChaser.Test.Controllers
     //---------------------------------------------------------------------------------------------
 
     [Test]
-    public async Task CreateGoalAsync_GivenInvalidUserToken_ShouldReturnBadRequest()
+    public async Task CreateGoalAsync_GivenNoUserToken_ShouldReturnBadRequest()
     {
       // Arrange.
       var goalStore = Substitute.For<IGoalStore>();
@@ -136,7 +313,40 @@ namespace BearChaser.Test.Controllers
       var result = await testObject.CreateGoalAsync(
         new GoalData
         {
-          UserToken = "Not A Guid",
+          Name = "NewGoal",
+          Period = 1,
+          FrequencyWithinPeriod = 2
+        });
+
+      // Assert.
+      var badRequestResult = result as BadRequestErrorMessageResult;
+
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("No token provided.", badRequestResult.Message);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task CreateGoalAsync_GivenInvalidUserToken_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalController(goalStore, userStore, tokenStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", "Not A Guid");
+
+      // Act.
+      var result = await testObject.CreateGoalAsync(
+        new GoalData
+        {
           Name = "NewGoal",
           Period = 1,
           FrequencyWithinPeriod = 2
@@ -162,13 +372,18 @@ namespace BearChaser.Test.Controllers
       var testObject = new GoalController(goalStore, userStore, tokenStore, log);
       var guid = Guid.NewGuid();
 
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
       tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns((Token)null);
 
       // Act.
       var result = await testObject.CreateGoalAsync(
         new GoalData
         {
-          UserToken = guid.ToString(),
           Name = "NewGoal",
           Period = 1,
           FrequencyWithinPeriod = 2
@@ -195,6 +410,12 @@ namespace BearChaser.Test.Controllers
       var guid = Guid.NewGuid();
       var userToken = new Token();
 
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", guid.ToString());
+
       tokenStore.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
       userStore.GetUserAsync(userToken).Returns((User)null);
 
@@ -202,7 +423,6 @@ namespace BearChaser.Test.Controllers
       var result = await testObject.CreateGoalAsync(
         new GoalData
         {
-          UserToken = guid.ToString(),
           Name = "NewGoal",
           Period = 1,
           FrequencyWithinPeriod = 2

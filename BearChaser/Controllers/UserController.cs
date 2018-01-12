@@ -37,7 +37,7 @@ namespace BearChaser.Controllers
     //---------------------------------------------------------------------------------------------
 
     [HttpPost]
-    [Route("api/user/register")]
+    [Route("api/users/register")]
     public async Task<IHttpActionResult> Register(UserLoginData userLogin)
     {
       var username = userLogin.Username ?? string.Empty;
@@ -72,7 +72,7 @@ namespace BearChaser.Controllers
     //---------------------------------------------------------------------------------------------
 
     [HttpPost]
-    [Route("api/user/login")]
+    [Route("api/users/login")]
     public async Task<IHttpActionResult> Login(UserLoginData userLogin)
     {
       var username = userLogin.Username ?? string.Empty;

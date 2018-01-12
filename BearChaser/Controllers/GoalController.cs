@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
+using AutoMapper;
 using BearChaser.DataTransferObjects;
+using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
+using Newtonsoft.Json;
+using WebGrease.Css.Extensions;
 
 namespace BearChaser.Controllers
 {
@@ -52,30 +59,54 @@ namespace BearChaser.Controllers
 
     //---------------------------------------------------------------------------------------------
 
-    [HttpPost]
-    [Route("api/goal/create")]
-    public async Task<IHttpActionResult> CreateGoalAsync(GoalData goalData)
+    [HttpGet]
+    [Route("api/goals")]
+    public async Task<IHttpActionResult> GetGoalsAsync()
     {
-      if (Guid.TryParse(goalData.UserToken, out Guid userToken) == false)
+      User user;
+
+      try
       {
-        return BadRequest("Invalid user token format.");
+        user = await GetUserForHeaderTokenAsync();
       }
-
-      var token = await _tokenStore.GetExistingValidTokenByGuidAsync(userToken);
-
-      if (token == null)
+      catch (AuthenticationException ex)
       {
-        return BadRequest("User token not found, it may have expired.");
+        return BadRequest(ex.Message);
       }
-
-      var user = await _userStore.GetUserAsync(token);
-
-      if (user == null)
+      catch (InternalServerException)
       {
-        _log.LogError($"User not found, but valid token exists: {token}");
         return InternalServerError();
       }
 
+      var goals = await _goalStore.GetGoalsAsync(user.Id);
+
+      var goalDatas = new List<GoalData>();
+      goals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
+
+      return Ok(JsonConvert.SerializeObject(goalDatas));
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [HttpPost]
+    [Route("api/goals/create")]
+    public async Task<IHttpActionResult> CreateGoalAsync(GoalData goalData)
+    {
+      User user;
+
+      try
+      {
+        user = await GetUserForHeaderTokenAsync();
+      }
+      catch (AuthenticationException ex)
+      {
+        return BadRequest(ex.Message);
+      }
+      catch (InternalServerException)
+      {
+        return InternalServerError();
+      }
+      
       Goal goal =
         await _goalStore.CreateGoalAsync(
           user.Id,
@@ -86,6 +117,40 @@ namespace BearChaser.Controllers
       _log.LogDebug($"Goal created: {goal}");
 
       return Ok();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    private async Task<User> GetUserForHeaderTokenAsync()
+    {
+      string auth = Request?.Headers?.GetValues("auth").FirstOrDefault();
+
+      if (auth == null)
+      {
+        throw new AuthenticationException("No token provided.");
+      }
+
+      if (Guid.TryParse(auth, out Guid userToken) == false)
+      {
+        throw new AuthenticationException("Invalid user token format.");
+      }
+
+      Token token = await _tokenStore.GetExistingValidTokenByGuidAsync(userToken);
+
+      if (token == null)
+      {
+        throw new AuthenticationException("User token not found, it may have expired.");
+      }
+
+      User user = await _userStore.GetUserAsync(token);
+
+      if (user == null)
+      {
+        _log.LogError($"User not found, but valid token exists: {token}");
+        throw new InternalServerException();
+      }
+
+      return user;
     }
 
     //---------------------------------------------------------------------------------------------
