@@ -9,8 +9,9 @@ namespace BearChaser.Db
     //---------------------------------------------------------------------------------------------
 
     void AddAttempt(GoalAttempt goal);
-    void RemoveAttempt(GoalAttempt goal);
+    Task RemoveAttempt(int attemptId);
     Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId);
+    Task<GoalAttempt> GetAttemptAsync(int attemptId);
     Task SaveAsync();
 
     //---------------------------------------------------------------------------------------------

@@ -89,9 +89,16 @@ namespace BearChaser.Db
 
     //---------------------------------------------------------------------------------------------
 
-    public void RemoveAttempt(GoalAttempt goal)
+    public async Task RemoveAttempt(int attemptId)
     {
-      GoalAttempts.Remove(goal);
+      GoalAttempt attempt = await GoalAttempts.FirstOrDefaultAsync(a => a.Id == attemptId);
+
+      if (attempt == null)
+      {
+        return;
+      }
+
+      GoalAttempts.Remove(attempt);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -99,6 +106,13 @@ namespace BearChaser.Db
     public async Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId)
     {
       return await GoalAttempts.Where(g => g.GoalId == goalId).ToListAsync();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<GoalAttempt> GetAttemptAsync(int attemptId)
+    {
+      return await GoalAttempts.FirstOrDefaultAsync(a => a.Id == attemptId);
     }
 
     // Common =====================================================================================

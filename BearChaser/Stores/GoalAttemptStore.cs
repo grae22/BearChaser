@@ -47,9 +47,9 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
 
-    public async Task RemoveAttemptAsync(GoalAttempt attempt)
+    public async Task RemoveAttemptAsync(int attemptId)
     {
-      _goalAttemptDb.RemoveAttempt(attempt);
+      await _goalAttemptDb.RemoveAttempt(attemptId);
       await _goalAttemptDb.SaveAsync();
     }
 
@@ -58,6 +58,13 @@ namespace BearChaser.Stores
     public async Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId)
     {
       return await _goalAttemptDb.GetAttemptsAsync(goalId);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    public async Task<GoalAttempt> GetAttemptAsync(int attemptId)
+    {
+      return await _goalAttemptDb.GetAttemptAsync(attemptId);
     }
 
     //---------------------------------------------------------------------------------------------

@@ -71,11 +71,10 @@ namespace BearChaser.Test.Stores
       var attemptToRemove = new GoalAttempt();
 
       // Act.
-      await testObject.RemoveAttemptAsync(attemptToRemove);
+      await testObject.RemoveAttemptAsync(123);
 
       // Assert.
-      attemptDb.Received(1).RemoveAttempt(attemptToRemove);
-
+      await attemptDb.Received(1).RemoveAttempt(123);
       await attemptDb.Received(1).SaveAsync();
     }
     
@@ -96,7 +95,25 @@ namespace BearChaser.Test.Stores
       // Assert.
       await attemptDb.Received(1).GetAttemptsAsync(0);
     }
-    
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task GetAttemptAsync_GivenAttemptId_ShouldQueryDb()
+    {
+      // Arrange.
+      var attemptDb = Substitute.For<IGoalAttemptDb>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var dateTimeSource = Substitute.For<IDateTimeSource>();
+      var testObject = new GoalAttemptStore(attemptDb, goalStore, dateTimeSource);
+
+      // Act.
+      await testObject.GetAttemptAsync(123);
+
+      // Assert.
+      await attemptDb.Received(1).GetAttemptAsync(123);
+    }
+
     //---------------------------------------------------------------------------------------------
   }
 }

@@ -9,8 +9,9 @@ namespace BearChaser.Stores
     //---------------------------------------------------------------------------------------------
 
     Task<GoalAttempt> CreateAttemptAsync(int goalId);
-    Task RemoveAttemptAsync(GoalAttempt attempt);
+    Task RemoveAttemptAsync(int attemptId);
     Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId);
+    Task<GoalAttempt> GetAttemptAsync(int attemptId);
 
     //---------------------------------------------------------------------------------------------
   }

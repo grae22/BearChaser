@@ -215,6 +215,8 @@
     <Compile Include="Controllers\GoalAttemptController.cs" />
     <Compile Include="Controllers\GoalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\Utils\ControllerUtils.cs" />
+    <Compile Include="DataTransferObjects\GoalAttemptData.cs" />
     <Compile Include="DataTransferObjects\GoalData.cs" />
     <Compile Include="DataTransferObjects\UserLoginData.cs" />
     <Compile Include="Controllers\UserController.cs" />

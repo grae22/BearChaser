@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using BearChaser.Controllers.Utils;
 using Newtonsoft.Json;
 using WebGrease.Css.Extensions;
 using BearChaser.DataTransferObjects;
@@ -67,7 +68,7 @@ namespace BearChaser.Controllers
 
       try
       {
-        user = await GetUserForHeaderTokenAsync();
+        user = await ControllerUtils.GetUserForRequestHeaderTokenAsync(this, _tokenStore, _userStore, _log);
       }
       catch (AuthenticationException ex)
       {
@@ -100,7 +101,7 @@ namespace BearChaser.Controllers
 
       try
       {
-        user = await GetUserForHeaderTokenAsync();
+        user = await ControllerUtils.GetUserForRequestHeaderTokenAsync(this, _tokenStore, _userStore, _log);
       }
       catch (AuthenticationException ex)
       {
@@ -122,44 +123,6 @@ namespace BearChaser.Controllers
       _log.LogDebug($"Goal created: {goal}");
 
       return Ok(JsonConvert.SerializeObject(goalData));
-    }
-
-    //---------------------------------------------------------------------------------------------
-
-    private async Task<User> GetUserForHeaderTokenAsync()
-    {
-      string auth = Request?.Headers?.GetValues("auth").FirstOrDefault();
-
-      if (auth == null)
-      {
-        throw new AuthenticationException("No token provided.");
-      }
-
-      if (Guid.TryParse(auth, out Guid userToken) == false)
-      {
-        _log.LogDebug($"Invalid token format \"{auth}\".");
-        throw new AuthenticationException("Invalid user token format.");
-      }
-
-      Token token = await _tokenStore.GetExistingValidTokenByGuidAsync(userToken);
-
-      if (token == null)
-      {
-        _log.LogDebug($"Token not found \"{auth}\".");
-        throw new AuthenticationException("User token not found, it may have expired.");
-      }
-
-      User user = await _userStore.GetUserAsync(token);
-
-      if (user == null)
-      {
-        _log.LogError($"User not found, but valid token exists: {token}");
-        throw new InternalServerException();
-      }
-
-      _log.LogDebug($"Found user \"{user.Username}\" for token {token}.");
-
-      return user;
     }
 
     //---------------------------------------------------------------------------------------------
