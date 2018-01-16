@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace BearChaser.Utils.Logging
 {
@@ -9,36 +10,44 @@ namespace BearChaser.Utils.Logging
 
     public void LogDebug(string message,
                          bool includeStackTrace = false,
-                         string source = null)
+                         string sourceFilePath = null,
+                         string sourceMember = null,
+                         int sourceLine = -1)
     {
-      LogMessage("Debug", message, includeStackTrace, source);
+      LogMessage("Debug", message, includeStackTrace, sourceFilePath, sourceMember, sourceLine);
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogInfo(string message,
                         bool includeStackTrace = false,
-                        string source = null)
+                        string sourceFilePath = null,
+                        string sourceMember = null,
+                        int sourceLine = -1)
     {
-      LogMessage("Info", message, includeStackTrace, source);
+      LogMessage("Info", message, includeStackTrace, sourceFilePath, sourceMember, sourceLine);
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogWarning(string message,
                            bool includeStackTrace = false,
-                           string source = null)
+                           string sourceFilePath = null,
+                           string sourceMember = null,
+                           int sourceLine = -1)
     {
-      LogMessage("Warning", message, includeStackTrace, source);
+      LogMessage("Warning", message, includeStackTrace, sourceFilePath, sourceMember, sourceLine);
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogError(string message,
                          bool includeStackTrace = true,
-                         string source = null)
+                         string sourceFilePath = null,
+                         string sourceMember = null,
+                         int sourceLine = -1)
     {
-      LogMessage("Error", message, includeStackTrace, source);
+      LogMessage("Error", message, includeStackTrace, sourceFilePath, sourceMember, sourceLine);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -46,11 +55,15 @@ namespace BearChaser.Utils.Logging
     private static void LogMessage(string category,
                                    string message,
                                    bool includeStackTrace,
-                                   string source)
+                                   string sourceFilePath = null,
+                                   string sourceMember = null,
+                                   int sourceLine = -1)
     {
       try
       {
-        Console.WriteLine($"{DateTime.Now:u} | {category} | {source} | {message} |");
+        string source = BuildSourceString(sourceFilePath, sourceMember, sourceLine);
+
+        Console.WriteLine($"{DateTime.Now:u} | {category} | {message} | {source} |");
 
         if (includeStackTrace)
         {
@@ -61,6 +74,18 @@ namespace BearChaser.Utils.Logging
       {
         Console.WriteLine($"ERROR: Error while logging to console - {ex.Message}");
       }
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    private static string BuildSourceString(string filePath,
+                                            string memberName,
+                                            int line)
+    {
+      filePath = filePath ?? string.Empty;
+      memberName = memberName ?? string.Empty;
+
+      return $"{Path.GetFileName(filePath)}({line}):{memberName}()";
     }
 
     //---------------------------------------------------------------------------------------------

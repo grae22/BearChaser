@@ -90,7 +90,12 @@ namespace BearChaser.Test.Stores
       // Assert.
       Assert.AreEqual(666, value);
 
-      log.Received(1).LogError("Setting \"SomeKey\" contains an invalid integer value \"123x\". Using default value \"666\".");
+      log.Received(1).LogError(
+        "Setting \"SomeKey\" contains an invalid integer value \"123x\". Using default value \"666\".",
+        Arg.Any<bool>(),
+        Arg.Any<string>(),
+        Arg.Any<string>(),
+        Arg.Any<int>());
     }
 
     //---------------------------------------------------------------------------------------------

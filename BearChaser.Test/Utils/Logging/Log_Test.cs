@@ -25,8 +25,8 @@ namespace BearChaser.Test.Utils.Logging
       testObject.LogDebug("Message");
 
       // Assert.
-      log1.Received(1).LogDebug("Message");
-      log2.Received(1).LogDebug("Message");
+      log1.Received(1).LogDebug("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+      log2.Received(1).LogDebug("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
     }
 
     //---------------------------------------------------------------------------------------------
@@ -46,8 +46,8 @@ namespace BearChaser.Test.Utils.Logging
       testObject.LogInfo("Message");
 
       // Assert.
-      log1.Received(1).LogInfo("Message");
-      log2.Received(1).LogInfo("Message");
+      log1.Received(1).LogInfo("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+      log2.Received(1).LogInfo("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
     }
 
     //---------------------------------------------------------------------------------------------    
@@ -67,8 +67,8 @@ namespace BearChaser.Test.Utils.Logging
       testObject.LogWarning("Message");
 
       // Assert.
-      log1.Received(1).LogWarning("Message");
-      log2.Received(1).LogWarning("Message");
+      log1.Received(1).LogWarning("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+      log2.Received(1).LogWarning("Message", false, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
     }
 
     //---------------------------------------------------------------------------------------------
@@ -88,8 +88,8 @@ namespace BearChaser.Test.Utils.Logging
       testObject.LogError("Message");
 
       // Assert.
-      log1.Received(1).LogError("Message");
-      log2.Received(1).LogError("Message");
+      log1.Received(1).LogError("Message", true, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
+      log2.Received(1).LogError("Message", true, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>());
     }
 
     //---------------------------------------------------------------------------------------------

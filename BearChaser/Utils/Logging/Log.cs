@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace BearChaser.Utils.Logging
 {
@@ -19,36 +20,64 @@ namespace BearChaser.Utils.Logging
 
     public void LogDebug(string message,
                          bool includeStackTrace = false,
-                         string source = null)
+                         [CallerFilePath] string sourceFilePath = null,
+                         [CallerMemberName] string sourceMember = null,
+                         [CallerLineNumber] int sourceLine = -1)
     {
-      _logs.ForEach(l => l.LogDebug(message, includeStackTrace, source));
+      _logs.ForEach(l => l.LogDebug(
+        message,
+        includeStackTrace,
+        sourceFilePath,
+        sourceMember,
+        sourceLine));
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogInfo(string message,
                         bool includeStackTrace = false,
-                        string source = null)
+                        [CallerFilePath] string sourceFilePath = null,
+                        [CallerMemberName] string sourceMember = null,
+                        [CallerLineNumber] int sourceLine = -1)
     {
-      _logs.ForEach(l => l.LogInfo(message, includeStackTrace, source));
+      _logs.ForEach(l => l.LogInfo(
+        message,
+        includeStackTrace,
+        sourceFilePath,
+        sourceMember,
+        sourceLine));
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogWarning(string message,
                            bool includeStackTrace = false,
-                           string source = null)
+                           [CallerFilePath] string sourceFilePath = null,
+                           [CallerMemberName] string sourceMember = null,
+                           [CallerLineNumber] int sourceLine = -1)
     {
-      _logs.ForEach(l => l.LogWarning(message, includeStackTrace, source));
+      _logs.ForEach(l => l.LogWarning(
+        message,
+        includeStackTrace,
+        sourceFilePath,
+        sourceMember,
+        sourceLine));
     }
 
     //---------------------------------------------------------------------------------------------
 
     public void LogError(string message,
                          bool includeStackTrace = true,
-                         string source = null)
+                         [CallerFilePath] string sourceFilePath = null,
+                         [CallerMemberName] string sourceMember = null,
+                         [CallerLineNumber] int sourceLine = -1)
     {
-      _logs.ForEach(l => l.LogError(message, includeStackTrace, source));
+      _logs.ForEach(l => l.LogError(
+        message,
+        includeStackTrace,
+        sourceFilePath,
+        sourceMember,
+        sourceLine));
     }
 
     //---------------------------------------------------------------------------------------------
