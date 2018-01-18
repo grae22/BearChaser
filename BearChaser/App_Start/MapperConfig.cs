@@ -19,7 +19,11 @@ namespace BearChaser
         return;
       }
 
-      Mapper.Initialize(cfg => cfg.CreateMap<Goal, GoalData>());
+      Mapper.Initialize(cfg =>
+      {
+        cfg.CreateMap<Goal, GoalData>();
+        cfg.CreateMap<GoalAttempt, GoalAttemptData>();
+      });
 
       _isInitialised = true;
     }

@@ -5,7 +5,7 @@ using System.Web.Http.Results;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using NSubstitute;
-using BearChaser.Controllers;
+using BearChaser.Controllers.Api;
 using BearChaser.DataTransferObjects;
 using BearChaser.Models;
 using BearChaser.Settings;
@@ -13,7 +13,7 @@ using BearChaser.Stores;
 using BearChaser.Utils;
 using BearChaser.Utils.Logging;
 
-namespace BearChaser.Test.Controllers
+namespace BearChaser.Test.Controllers.Api
 {
   [TestFixture]
   [Category("UserController")]

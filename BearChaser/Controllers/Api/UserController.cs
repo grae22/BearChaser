@@ -10,7 +10,7 @@ using BearChaser.Stores;
 using BearChaser.Utils;
 using BearChaser.Utils.Logging;
 
-namespace BearChaser.Controllers
+namespace BearChaser.Controllers.Api
 {
   public class UserController : ApiController
   {

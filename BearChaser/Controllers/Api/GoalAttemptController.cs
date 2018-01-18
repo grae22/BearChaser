@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
+using AutoMapper;
 using BearChaser.Controllers.Utils;
 using BearChaser.DataTransferObjects;
 using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
+using Newtonsoft.Json;
+using WebGrease.Css.Extensions;
 
-namespace BearChaser.Controllers
+namespace BearChaser.Controllers.Api
 {
   public class GoalAttemptController : ApiController
   {
@@ -140,6 +144,47 @@ namespace BearChaser.Controllers
       _log.LogInfo($"Created goal-attempt {attemptId} for user {user.Id}.");
 
       return Ok();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [HttpGet]
+    [Route("api/goalAttempts")]
+    public async Task<IHttpActionResult> GetAttemptsAsync(int goalId)
+    {
+      User user;
+
+      try
+      {
+        user = await ControllerUtils.GetUserForRequestHeaderTokenAsync(this, _tokenStore, _userStore, _log);
+      }
+      catch (AuthenticationException ex)
+      {
+        return BadRequest(ex.Message);
+      }
+      catch (InternalServerException)
+      {
+        return InternalServerError();
+      }
+
+      Goal goal = await _goalStore.GetGoalAsync(goalId);
+
+      if (goal == null || goal.UserId != user.Id)
+      {
+        _log.LogDebug($"Goal not found with id {goalId} for user {user.Id}.");
+        return NotFound();
+      }
+
+      var attempts = await _attemptStore.GetAttemptsAsync(goalId);
+
+      var attemptDatas = new List<GoalAttemptData>();
+      attempts.ForEach(a => attemptDatas.Add(Mapper.Map<GoalAttemptData>(a)));
+
+      string serialisedAttempts = JsonConvert.SerializeObject(attemptDatas);
+
+      _log.LogDebug($"Found attempts for goal id {goalId} for user {user.Id} : {serialisedAttempts}");
+      
+      return Ok(serialisedAttempts);
     }
 
     //---------------------------------------------------------------------------------------------

@@ -8,13 +8,13 @@ using AutoMapper;
 using NUnit.Framework;
 using NSubstitute;
 using Newtonsoft.Json;
-using BearChaser.Controllers;
+using BearChaser.Controllers.Api;
 using BearChaser.DataTransferObjects;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
 
-namespace BearChaser.Test.Controllers
+namespace BearChaser.Test.Controllers.Api
 {
   [TestFixture]
   [Category("GoalController")]

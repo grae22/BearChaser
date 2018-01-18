@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
-using BearChaser.Controllers.Utils;
 using Newtonsoft.Json;
 using WebGrease.Css.Extensions;
+using BearChaser.Controllers.Utils;
 using BearChaser.DataTransferObjects;
 using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
 
-namespace BearChaser.Controllers
+namespace BearChaser.Controllers.Api
 {
   public class GoalController : ApiController
   {

@@ -1,2 +1,2 @@
 ﻿x Mechanism for renewing/replacing user token.
-x API method(s) to retrieve and remove goal efforts.
+x Support for 'do less' - in addition to recording 'attempts' to reflect action, may want to (positively) reflect lack of action (e.g. quitting smoking).
