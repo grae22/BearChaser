@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <form>
+      <input id='username' type='text' value='user1' />
+      <input id='password' type='password' value='password1' />
+      <input id='doLogin' type='button' value='Login' />
+      <input id='doRegister' type='button' value='Register' />
+    </form>
+    <form>
+      <input id='goal' type='text' />
+      <input id='doAddGoal' type='button' value='Add' />
+    </form>
+    <p id='goalSection' />
+
+    <script type='text/javascript'>
+      $(document).ready(function ()      
+      {
+        $('#doRegister').click(function ()
+        {
+          var username = $('#username').val();
+          var password = $('#password').val();
+        
+          $.post(
+            'https://bearchaser.azurewebsites.net/api/users/register',
+            { 'username': username, 'password': password },
+            function () { alert('Registered'); });
+        });
+
+        $('#doLogin').click(function ()
+        {
+          var username = $('#username').val();
+          var password = $('#password').val();
+        
+          $.post(
+            'https://bearchaser.azurewebsites.net/api/users/login',
+            { 'username': username, 'password': password },
+            function (token)
+            {
+              UpdateToken(token);
+              GetAndPopulateGoals();
+            });
+        });
+
+        $('#doAddGoal').click(function ()
+        {
+          var name = $('#goal').val();
+          var period = 1;
+          var frequency = 1;
+        
+          $.ajax({
+            url: 'https://bearchaser.azurewebsites.net/api/goals/create',
+            type: 'POST',
+            headers: { 'auth': document.cookie },
+            data: { 'Id': 0, 'Name': name, 'Period': period, 'FrequencyWithinPeriod': frequency },
+            success: function () { console.log('Added goal.'); GetAndPopulateGoals(); },
+            error: console.log('Error adding goal.')
+          });
+        });
+      });
+      
+      function UpdateToken(data)
+      {
+        console.log(data);
+        var token = data.replace(/\"/g, '');
+        console.log(token);
+        
+        document.cookie = token;
+      }
+      
+      function GetAndPopulateGoals()      
+      {
+        $.ajax({
+          url: 'https://bearchaser.azurewebsites.net/api/goals',
+          type: 'GET',
+          headers: { 'auth': document.cookie },
+          contentType: 'application/json; charset=utf-8',
+          success: function (data) { console.log('Retrieved goals.'); PopulateGoals(data); },
+          error: function (xhr, status, error) { console.log('Error retrieving goals: ' + error); }
+        });
+      }
+      
+      function PopulateGoals(goals)
+      {
+        console.log(goals);
+        
+        goals = JSON.parse(goals);
+        
+        var content = '<table>';
+        
+        $.each(goals, function(i, e)
+        {
+          content +=
+            "<tr><td>" + e.Name + "</td><td><input id='goalAttempt" + e.Id +
+            "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' /></td></tr>";
+        });
+        
+        $('#goalSection').empty();
+        $('#goalSection').append(content);
+      }
+      
+      function CreateGoalAttempt(goalId)
+      {
+        $.ajax({
+          url: 'https://bearchaser.azurewebsites.net/api/goalAttempts/create',
+          type: 'POST',
+          headers: { 'auth': document.cookie },
+          data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
+          success: function () { console.log('Added goal-attempt.'); alert('Attempt added.'); },
+          error: function (xhr, status, error) { console.log('Error adding goal-attempt: ' + error); }
+        });
+      }
+    </script
+  </body>
+</html>
