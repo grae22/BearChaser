@@ -96,6 +96,8 @@ namespace BearChaser.Controllers.Api
     [Route("api/goals/create")]
     public async Task<IHttpActionResult> CreateGoalAsync(GoalData goalData)
     {
+      _log.LogDebug($"Request: {JsonConvert.SerializeObject(goalData)}");
+
       User user;
 
       try

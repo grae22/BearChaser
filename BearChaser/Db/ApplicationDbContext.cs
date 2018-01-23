@@ -17,6 +17,15 @@ namespace BearChaser.Db
     public DbSet<Goal> Goals { get; set; }
     public DbSet<GoalAttempt> GoalAttempts { get; set; }
 
+    //---------------------------------------------------------------------------------------------
+
+    public ApplicationDbContext()
+    :
+      base("DefaultConnection")
+    {
+      
+    }
+
     // ITokenDb ===================================================================================
 
     public void AddToken(Token token)

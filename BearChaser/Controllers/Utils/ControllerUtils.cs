@@ -19,13 +19,14 @@ namespace BearChaser.Controllers.Utils
                                                               IUserStore userStore,
                                                               ILogger log)
     {
-      string auth = controller.Request?.Headers?.GetValues("auth").FirstOrDefault();
-
-      if (auth == null)
+      if (controller.Request?.Headers?.Contains("auth") == false)
       {
+        log.LogDebug("No token provided.");
         throw new AuthenticationException("No token provided.");
       }
 
+      string auth = controller.Request?.Headers?.GetValues("auth").FirstOrDefault();
+      
       if (Guid.TryParse(auth, out Guid userToken) == false)
       {
         log.LogDebug($"Invalid token format \"{auth}\".");
