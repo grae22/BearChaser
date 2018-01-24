@@ -28,7 +28,7 @@
           var password = $('#password').val();
         
           $.post(
-            '/BearChaserAPI/api/users/register',
+            '/api/users/register',
             { 'username': username, 'password': password },
             function () { alert('Registered'); });
         });
@@ -42,7 +42,7 @@
           document.cookie = 'password=' + password;
         
           $.post(
-            '/BearChaserAPI/api/users/login',
+            '/api/users/login',
             { 'username': username, 'password': password },
             function (token)
             {
@@ -58,7 +58,7 @@
           var frequency = 1;
         
           $.ajax({
-            url: '/BearChaserAPI/api/goals/create',
+            url: '/api/goals/create',
             type: 'POST',
             headers: { 'auth': GetToken() },
             data: { 'Id': 0, 'Name': name, 'Period': period, 'FrequencyWithinPeriod': frequency },
@@ -80,7 +80,7 @@
       function GetAndPopulateGoals()      
       {
         $.ajax({
-          url: '/BearChaserAPI/api/goals',
+          url: '/api/goals',
           type: 'GET',
           headers: { 'auth': GetToken() },
           contentType: 'application/json; charset=utf-8',
@@ -111,7 +111,7 @@
       function CreateGoalAttempt(goalId)
       {
         $.ajax({
-          url: '/BearChaserAPI/api/goalAttempts/create',
+          url: '/api/goalAttempts/create',
           type: 'POST',
           headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
