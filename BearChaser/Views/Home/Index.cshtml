@@ -5,8 +5,8 @@
   </head>
   <body>
     <form>
-      <input id='username' type='text' value='user1' />
-      <input id='password' type='password' value='password1' />
+      <input id='username' type='text' />
+      <input id='password' type='password' />
       <input id='doLogin' type='button' value='Login' />
       <input id='doRegister' type='button' value='Register' />
     </form>
@@ -19,13 +19,16 @@
     <script type='text/javascript'>
       $(document).ready(function ()      
       {
+        $('#username').val(GetCookie('username'));
+        $('#password').val(GetCookie('password'));
+      
         $('#doRegister').click(function ()
         {
           var username = $('#username').val();
           var password = $('#password').val();
         
           $.post(
-            'https://bearchaser.azurewebsites.net/api/users/register',
+            '/BearChaserAPI/api/users/register',
             { 'username': username, 'password': password },
             function () { alert('Registered'); });
         });
@@ -34,9 +37,12 @@
         {
           var username = $('#username').val();
           var password = $('#password').val();
+          
+          document.cookie = 'username=' + username;
+          document.cookie = 'password=' + password;
         
           $.post(
-            'https://bearchaser.azurewebsites.net/api/users/login',
+            '/BearChaserAPI/api/users/login',
             { 'username': username, 'password': password },
             function (token)
             {
@@ -52,9 +58,9 @@
           var frequency = 1;
         
           $.ajax({
-            url: 'https://bearchaser.azurewebsites.net/api/goals/create',
+            url: '/BearChaserAPI/api/goals/create',
             type: 'POST',
-            headers: { 'auth': document.cookie },
+            headers: { 'auth': GetToken() },
             data: { 'Id': 0, 'Name': name, 'Period': period, 'FrequencyWithinPeriod': frequency },
             success: function () { console.log('Added goal.'); GetAndPopulateGoals(); },
             error: console.log('Error adding goal.')
@@ -68,15 +74,15 @@
         var token = data.replace(/\"/g, '');
         console.log(token);
         
-        document.cookie = token;
+        document.cookie = 'token=' + token;
       }
       
       function GetAndPopulateGoals()      
       {
         $.ajax({
-          url: 'https://bearchaser.azurewebsites.net/api/goals',
+          url: '/BearChaserAPI/api/goals',
           type: 'GET',
-          headers: { 'auth': document.cookie },
+          headers: { 'auth': GetToken() },
           contentType: 'application/json; charset=utf-8',
           success: function (data) { console.log('Retrieved goals.'); PopulateGoals(data); },
           error: function (xhr, status, error) { console.log('Error retrieving goals: ' + error); }
@@ -105,13 +111,25 @@
       function CreateGoalAttempt(goalId)
       {
         $.ajax({
-          url: 'https://bearchaser.azurewebsites.net/api/goalAttempts/create',
+          url: '/BearChaserAPI/api/goalAttempts/create',
           type: 'POST',
-          headers: { 'auth': document.cookie },
+          headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
           success: function () { console.log('Added goal-attempt.'); alert('Attempt added.'); },
           error: function (xhr, status, error) { console.log('Error adding goal-attempt: ' + error); }
         });
+      }
+      
+      function GetCookie(name)
+      {
+        var re = new RegExp(name + "=([^;]+)");
+        var value = re.exec(document.cookie);
+        return (value != null) ? unescape(value[1]) : null;
+      }
+      
+      function GetToken()
+      {
+        return GetCookie('token');
       }
     </script
   </body>
