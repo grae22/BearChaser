@@ -28,9 +28,7 @@
     <script type='text/javascript'>
       $(document).ready(function ()      
       {
-        $('#username').val(GetCookie('username'));
-        $('#password').val(GetCookie('password'));
-      
+        // Register.
         $('#doRegister').click(function ()
         {
           var username = $('#username').val();
@@ -42,8 +40,9 @@
             function () { alert('Registered'); });
         });
 
+        // Login.
         $('#doLogin').click(function ()
-        {
+        {          console.log('hi2');
           var username = $('#username').val();
           var password = $('#password').val();
           
@@ -65,6 +64,7 @@
             });
         });
 
+        // Add Goal.
         $('#doAddGoal').click(function ()
         {
           var name = $('#goal').val();
@@ -81,6 +81,15 @@
             error: alert('Error adding goal.')
           });
         });
+        
+        // Auto-login if we have credentials.
+        $('#username').val(GetCookie('username'));
+        $('#password').val(GetCookie('password'));
+
+        if ($('#username').val().length > 0 && $('#password').val().length > 0)
+        {
+          document.getElementById('doLogin').click();
+        }
       });
       
       function UpdateToken(data)
