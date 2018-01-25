@@ -255,6 +255,14 @@
     <Compile Include="Migrations\201801250901581_AddedStartDateToGoalModel.Designer.cs">
       <DependentUpon>201801250901581_AddedStartDateToGoalModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801251204490_ChangedGoalPeriodToHoursValue.cs" />
+    <Compile Include="Migrations\201801251204490_ChangedGoalPeriodToHoursValue.Designer.cs">
+      <DependentUpon>201801251204490_ChangedGoalPeriodToHoursValue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801251357475_SpecifiedGoalStartDateColumnType.cs" />
+    <Compile Include="Migrations\201801251357475_SpecifiedGoalStartDateColumnType.Designer.cs">
+      <DependentUpon>201801251357475_SpecifiedGoalStartDateColumnType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
     <Compile Include="Models\Goal.cs" />
@@ -371,6 +379,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801250901581_AddedStartDateToGoalModel.resx">
       <DependentUpon>201801250901581_AddedStartDateToGoalModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801251204490_ChangedGoalPeriodToHoursValue.resx">
+      <DependentUpon>201801251204490_ChangedGoalPeriodToHoursValue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801251357475_SpecifiedGoalStartDateColumnType.resx">
+      <DependentUpon>201801251357475_SpecifiedGoalStartDateColumnType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

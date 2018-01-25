@@ -134,7 +134,7 @@ namespace BearChaser.Controllers.Api
       Goal goal = await _goalStore.CreateGoalAsync(
         user.Id,
         goalData.Name,
-        (Goal.TimePeriod)goalData.Period,
+        goalData.PeriodInHours,
         goalData.FrequencyWithinPeriod);
 
       goalData.Id = goal.Id;
@@ -146,6 +146,8 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    [HttpGet]
+    [Route("api/goals/periodStats")]
     public async Task<IHttpActionResult> GetPeriodStatsAsync(int goalId)
     {
       _log.LogDebug($"Request: {goalId}");
@@ -169,14 +171,14 @@ namespace BearChaser.Controllers.Api
 
       if (goal == null || goal.UserId != user.Id)
       {
+        _log.LogDebug($"Goal {goalId} not found for user {user.Id}.");
         return NotFound();
       }
 
-      DateTime periodStart;
-      DateTime periodEnd;
-      GetPeriodBoundsForTime(goal.Period, DateTime.UtcNow, out periodStart, out periodEnd);
+      GetPeriodBoundsForTime(goal, _dateTime.Now, out DateTime periodStart, out DateTime periodEnd);
 
       var attempts = await _goalAttemptStore.GetAttemptsAsync(goalId);
+      attempts = attempts.Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd);
       
       var stats = new GoalPeriodStatsData
       {
@@ -187,18 +189,23 @@ namespace BearChaser.Controllers.Api
         TargetAttemptCount = goal.FrequencyWithinPeriod
       };
 
+      _log.LogDebug($"Retrieved stats for user {user.Id}, goal {goalId} : {JsonConvert.SerializeObject(stats)}");
+
       return Ok(JsonConvert.SerializeObject(stats));
     }
 
     //---------------------------------------------------------------------------------------------
 
-    private static void GetPeriodBoundsForTime(Goal.TimePeriod periodType,
+    private static void GetPeriodBoundsForTime(Goal goal,
                                                DateTime time,
                                                out DateTime periodStart,
                                                out DateTime periodEnd)
     {
-      periodStart = new DateTime();
-      periodEnd = new DateTime();
+      double hoursSinceStart = (time - goal.StartDate).TotalHours;
+      int periodsSinceStart = (int)(hoursSinceStart / goal.PeriodInHours);
+
+      periodStart = goal.StartDate.AddHours(periodsSinceStart * goal.PeriodInHours);
+      periodEnd = goal.StartDate.AddHours((periodsSinceStart + 1) * goal.PeriodInHours).AddSeconds(-1);
     }
 
     //---------------------------------------------------------------------------------------------

@@ -26,19 +26,19 @@ namespace BearChaser.Stores
 
     public async Task<Goal> CreateGoalAsync(int userId,
                                             string name,
-                                            Goal.TimePeriod period,
+                                            int periodInHours,
                                             int frequencyWithinPeriod)
     {
       await ValidateUserExists(userId);
       ValidateGoalName(name);
-      ValidatePeriod(period);
+      ValidatePeriod(periodInHours);
       ValidateFrequency(frequencyWithinPeriod);
 
       var goal = new Goal
       {
         Name = name,
         UserId = userId,
-        Period = period,
+        PeriodInHours = periodInHours,
         FrequencyWithinPeriod = frequencyWithinPeriod
       };
 
@@ -93,14 +93,14 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
 
-    private static void ValidatePeriod(Goal.TimePeriod period)
+    private static void ValidatePeriod(int periodInHours)
     {
-      if (Enum.IsDefined(typeof(Goal.TimePeriod), period))
+      if (periodInHours > 0)
       {
         return;
       }
 
-      throw new ArgumentException($"Invalid period value {period}.");
+      throw new ArgumentException($"Invalid period value {periodInHours}.");
     }
 
     //---------------------------------------------------------------------------------------------

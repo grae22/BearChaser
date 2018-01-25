@@ -8,7 +8,7 @@ namespace BearChaser.DataTransferObjects
 
     public int Id { get; set; }
     public string Name { get; set; }
-    public int Period { get; set; }
+    public int PeriodInHours { get; set; }
     public int FrequencyWithinPeriod { get; set; }
     public DateTime StartDate { get; set; }
 

@@ -182,7 +182,7 @@ namespace BearChaser.Test.Controllers.Api
           Id = 10,
           UserId = 123,
           Name = "Some Goal",
-          Period = Goal.TimePeriod.Day,
+          PeriodInHours = 24,
           FrequencyWithinPeriod = 1
         }
       };
@@ -332,27 +332,27 @@ namespace BearChaser.Test.Controllers.Api
         Id = 10,
         UserId = 123,
         Name = "NewGoal",
-        Period = (Goal.TimePeriod) 1,
+        PeriodInHours = 24,
         FrequencyWithinPeriod = 2,
         StartDate = DateTime.Now
       };
 
       var returnedGoalData = Mapper.Map<GoalData>(returnedGoal);
 
-      objects.Goals.CreateGoalAsync(123, "NewGoal", (Goal.TimePeriod)1, 2).Returns(returnedGoal);
+      objects.Goals.CreateGoalAsync(123, "NewGoal", 24, 2).Returns(returnedGoal);
 
       // Act.
       var result = await objects.TestObject.CreateGoalAsync(
         new GoalData
         {
           Name = "NewGoal",
-          Period = 1,
+          PeriodInHours = 24,
           FrequencyWithinPeriod = 2,
           StartDate = returnedGoal.StartDate
         });
 
       // Assert.
-      await objects.Goals.Received(1).CreateGoalAsync(123, "NewGoal", (Goal.TimePeriod)1, 2);
+      await objects.Goals.Received(1).CreateGoalAsync(123, "NewGoal", 24, 2);
 
       var okResult = result as OkNegotiatedContentResult<string>;
 
@@ -378,7 +378,7 @@ namespace BearChaser.Test.Controllers.Api
         new GoalData
         {
           Name = "NewGoal",
-          Period = 1,
+          PeriodInHours = 1,
           FrequencyWithinPeriod = 2
         });
 
@@ -408,7 +408,7 @@ namespace BearChaser.Test.Controllers.Api
         new GoalData
         {
           Name = "NewGoal",
-          Period = 1,
+          PeriodInHours = 1,
           FrequencyWithinPeriod = 2
         });
 
@@ -441,7 +441,7 @@ namespace BearChaser.Test.Controllers.Api
         new GoalData
         {
           Name = "NewGoal",
-          Period = 1,
+          PeriodInHours = 1,
           FrequencyWithinPeriod = 2
         });
 
@@ -476,7 +476,7 @@ namespace BearChaser.Test.Controllers.Api
         new GoalData
         {
           Name = "NewGoal",
-          Period = 1,
+          PeriodInHours = 1,
           FrequencyWithinPeriod = 2
         });
 
@@ -650,7 +650,7 @@ namespace BearChaser.Test.Controllers.Api
       var objects = CreateTestObjects();
       var guid = Guid.NewGuid();
       var userToken = new Token();
-      var now = DateTime.Now;
+      var requestDate = new DateTime(2018, 1, 10);
 
       objects.TestObject.ControllerContext = new HttpControllerContext
       {
@@ -660,26 +660,26 @@ namespace BearChaser.Test.Controllers.Api
 
       objects.Tokens.GetExistingValidTokenByGuidAsync(guid).Returns(userToken);
       objects.Users.GetUserAsync(userToken).Returns(new User { Id = 100 });
-      objects.DateTime.Now.Returns(now);
+      objects.DateTime.Now.Returns(requestDate);
 
       objects.Goals.GetGoalAsync(123).Returns(new Goal
       {
         Id = 123,
         UserId = 100,
-        Period = Goal.TimePeriod.Day,
+        PeriodInHours = 24,
         FrequencyWithinPeriod = 2,
-        StartDate = now
+        StartDate = new DateTime(2018, 1, 1)
       });
 
       objects.Attempts.GetAttemptsAsync(123).Returns(new List<GoalAttempt>
       {
         new GoalAttempt
         {
-          Timestamp = now.AddDays(-1)
+          Timestamp = requestDate.AddDays(-1)
         },
         new GoalAttempt
         {
-          Timestamp = now
+          Timestamp = requestDate.AddHours(12)
         }
       });
 
@@ -692,7 +692,7 @@ namespace BearChaser.Test.Controllers.Api
       var okResult = (OkNegotiatedContentResult<string>)result;
       var stats = JsonConvert.DeserializeObject<GoalPeriodStatsData>(okResult.Content);
 
-      var startOfDay = objects.DateTime.Now;
+      var startOfDay = requestDate;
       startOfDay = new DateTime(startOfDay.Year, startOfDay.Month, startOfDay.Day, 0, 0, 0, DateTimeKind.Utc);
       var endOfDay = new DateTime(startOfDay.Year, startOfDay.Month, startOfDay.Day, 23, 59, 59, DateTimeKind.Utc);
 
