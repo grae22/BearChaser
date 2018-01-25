@@ -49,11 +49,10 @@
           var now = new Date();
           var expiryTime = now.getTime() + (30 * 24 * 60 * 60 * 1000);
           now.setTime(expiryTime);
-          
-          document.cookie = 'secure';
-          document.cookie = 'username=' + username;
-          document.cookie = 'password=' + password;
-          document.cookie = ';expires=' + now.toUTCString();
+
+          document.cookie = 'secure' + ';expires=' + now.toUTCString();
+          document.cookie = 'username=' + username + ';expires=' + now.toUTCString();
+          document.cookie = 'password=' + password + ';expires=' + now.toUTCString();
         
           $.post(
             '/api/users/login',
@@ -173,7 +172,7 @@
       }
       
       function GetCookie(name)
-      {
+      {console.log(document.cookie);
         var re = new RegExp(name + "=([^;]+)");
         var value = re.exec(document.cookie);
         return (value != null) ? unescape(value[1]) : null;
