@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace BearChaser.Models
 {
@@ -23,6 +24,7 @@ namespace BearChaser.Models
     public string Name { get; set; }
     public TimePeriod Period { get; set; }
     public int FrequencyWithinPeriod { get; set; }
+    public DateTime StartDate { get; set; }
 
     //---------------------------------------------------------------------------------------------
 

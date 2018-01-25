@@ -2,15 +2,15 @@
 
 namespace BearChaser.DataTransferObjects
 {
-  public class GoalData
+  public class GoalPeriodStatsData
   {
     //---------------------------------------------------------------------------------------------
 
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int Period { get; set; }
-    public int FrequencyWithinPeriod { get; set; }
-    public DateTime StartDate { get; set; }
+    public int GoalId { get; set; }
+    public DateTime PeriodStart { get; set; }
+    public DateTime PeriodEnd { get; set; }
+    public int AttemptCount { get; set; }
+    public int TargetAttemptCount { get; set; }
 
     //---------------------------------------------------------------------------------------------
   }

@@ -195,6 +195,7 @@
     <Compile Include="Controllers\Utils\ControllerUtils.cs" />
     <Compile Include="DataTransferObjects\GoalAttemptData.cs" />
     <Compile Include="DataTransferObjects\GoalData.cs" />
+    <Compile Include="DataTransferObjects\GoalPeriodStatsData.cs" />
     <Compile Include="DataTransferObjects\UserLoginData.cs" />
     <Compile Include="Controllers\Api\UserController.cs" />
     <Compile Include="Db\IGoalAttemptDb.cs" />
@@ -249,6 +250,10 @@
     <Compile Include="Migrations\201801121329234_AddedGoalAttemptModel.cs" />
     <Compile Include="Migrations\201801121329234_AddedGoalAttemptModel.Designer.cs">
       <DependentUpon>201801121329234_AddedGoalAttemptModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801250901581_AddedStartDateToGoalModel.cs" />
+    <Compile Include="Migrations\201801250901581_AddedStartDateToGoalModel.Designer.cs">
+      <DependentUpon>201801250901581_AddedStartDateToGoalModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
@@ -363,6 +368,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801121329234_AddedGoalAttemptModel.resx">
       <DependentUpon>201801121329234_AddedGoalAttemptModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801250901581_AddedStartDateToGoalModel.resx">
+      <DependentUpon>201801250901581_AddedStartDateToGoalModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
