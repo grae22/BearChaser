@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using BearChaser.Migrations;
 using BearChaser.Models;
 
 namespace BearChaser.Db
@@ -23,7 +24,7 @@ namespace BearChaser.Db
     :
       base("DefaultConnection")
     {
-      
+      Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
     }
 
     // ITokenDb ===================================================================================
