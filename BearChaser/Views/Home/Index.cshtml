@@ -50,10 +50,10 @@
           var expiryTime = now.getTime() + (30 * 24 * 60 * 60 * 1000);
           now.setTime(expiryTime);
           
-          document.cookie = ';secure';
-          document.cookie = ';username=' + username;
-          document.cookie = ';password=' + password;
-          document.cookie = ';expires=' + now.toUTCString();
+          document.cookie = 'secure';
+          document.cookie = 'username=' + username;
+          document.cookie = 'password=' + password;
+          document.cookie = 'expires=' + now.toUTCString();
         
           $.post(
             '/api/users/login',
@@ -99,7 +99,7 @@
         var token = data.replace(/\"/g, '');
         console.log(token);
         
-        document.cookie = ';token=' + token;
+        document.cookie = 'token=' + token;
       }
       
       function GetAndPopulateGoals()      
