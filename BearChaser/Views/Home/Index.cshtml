@@ -42,7 +42,7 @@
 
         // Login.
         $('#doLogin').click(function ()
-        {          console.log('hi2');
+        {
           var username = $('#username').val();
           var password = $('#password').val();
           
@@ -53,7 +53,7 @@
           document.cookie = 'secure';
           document.cookie = 'username=' + username;
           document.cookie = 'password=' + password;
-          document.cookie = 'expires=' + now.toUTCString();
+          document.cookie = ';expires=' + now.toUTCString();
         
           $.post(
             '/api/users/login',
