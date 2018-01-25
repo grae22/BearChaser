@@ -29,6 +29,11 @@ namespace BearChaser.Test.Controllers.Utils
       var userStore = Substitute.For<IUserStore>();
       var log = Substitute.For<ILogger>();
 
+      controller.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+
       // Act & Assert.
       Assert.That(
         async () => await ControllerUtils.GetUserForRequestHeaderTokenAsync(controller, tokenStore, userStore, log),

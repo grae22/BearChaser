@@ -4,17 +4,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   </head>
   <body>
-    <form>
-      <input id='username' type='text' />
-      <input id='password' type='password' />
-      <input id='doLogin' type='button' value='Login' />
-      <input id='doRegister' type='button' value='Register' />
-    </form>
-    <form>
-      <input id='goal' type='text' />
-      <input id='doAddGoal' type='button' value='Add' />
-    </form>
-    <p id='goalSection' />
+    <div width='100vw'>
+      <form>
+        <input id='username' type='text' /><br />
+        <input id='password' type='password' /><br />
+        <input id='doLogin' type='button' value='Login' />
+        <input id='doRegister' type='button' value='Register' />
+      </form>
+      <br />
+      <form>
+        <input id='goal' type='text' /><br />
+        <input id='periodInHours' type='text' value='24' /><br />
+        <input id='frequency' type='text' value='1' /><br />
+        <input id='startDate' type='text' value='2018/01/01' /><br />
+        <input id='doAddGoal' type='button' value='Add' />
+      </form>
+      <p id='goalSection' />
+    </div>
 
     <script type='text/javascript'>
       $(document).ready(function ()      
@@ -54,16 +60,17 @@
         $('#doAddGoal').click(function ()
         {
           var name = $('#goal').val();
-          var period = 1;
-          var frequency = 1;
+          var period = $('#periodInHours').val();
+          var frequency = $('#frequency').val();
+          var startDate = $('#startDate').val();
         
           $.ajax({
             url: '/api/goals/create',
             type: 'POST',
             headers: { 'auth': GetToken() },
-            data: { 'Id': 0, 'Name': name, 'Period': period, 'FrequencyWithinPeriod': frequency },
-            success: function () { console.log('Added goal.'); GetAndPopulateGoals(); },
-            error: console.log('Error adding goal.')
+            data: { 'Id': 0, 'Name': name, 'PeriodInHours': period, 'FrequencyWithinPeriod': frequency, 'StartDate': startDate },
+            success: function () { GetAndPopulateGoals(); },
+            error: alert('Error adding goal.')
           });
         });
       });
@@ -85,7 +92,7 @@
           headers: { 'auth': GetToken() },
           contentType: 'application/json; charset=utf-8',
           success: function (data) { console.log('Retrieved goals.'); PopulateGoals(data); },
-          error: function (xhr, status, error) { console.log('Error retrieving goals: ' + error); }
+          error: function (xhr, status, error) { alert('Error retrieving goals: ' + error); }
         });
       }
       
@@ -101,11 +108,38 @@
         {
           content +=
             "<tr><td>" + e.Name + "</td><td><input id='goalAttempt" + e.Id +
-            "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' /></td></tr>";
+            "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' />" +
+            " <span id='attemptsForGoal" + e.Id + "' /></td></tr>";
         });
         
         $('#goalSection').empty();
         $('#goalSection').append(content);
+        
+        $.each(goals, function(i, e)
+        {
+          GetAndPopulateStats(e.Id);
+        });
+      }
+      
+      function GetAndPopulateStats(goalId)
+      {
+        $.ajax({
+          url: '/api/goals/periodStats?goalId=' + goalId,
+          type: 'GET',
+          headers: { 'auth': GetToken() },
+          contentType: 'application/json; charset=utf-8',
+          success: function (data) { console.log('Retrieved attempts.'); PopulateStats(data, goalId); },
+          error: function (xhr, status, error) { alert('Error retrieving attempts: ' + error); }
+        });
+      }
+      
+      function PopulateStats(data, goalId)
+      {
+        var stats = JSON.parse(data);
+        
+        $('#attemptsForGoal' + goalId).append(
+          stats.AttemptCount + '/' + stats.TargetAttemptCount + ' ' +
+          '(' + stats.PeriodEnd + ')');
       }
       
       function CreateGoalAttempt(goalId)
@@ -115,8 +149,8 @@
           type: 'POST',
           headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
-          success: function () { console.log('Added goal-attempt.'); alert('Attempt added.'); },
-          error: function (xhr, status, error) { console.log('Error adding goal-attempt: ' + error); }
+          success: function () { console.log('Added goal-attempt.'); GetAndPopulateGoals(); },
+          error: function (xhr, status, error) { alert('Error adding goal-attempt: ' + error); }
         });
       }
       

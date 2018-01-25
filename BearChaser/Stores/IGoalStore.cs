@@ -10,7 +10,7 @@ namespace BearChaser.Stores
 
     Task<Goal> CreateGoalAsync(int userId,
                                string name,
-                               Goal.TimePeriod period,
+                               int periodInHours,
                                int frequencyWithinPeriod);
 
     Task RemoveGoalAsync(Goal goal);

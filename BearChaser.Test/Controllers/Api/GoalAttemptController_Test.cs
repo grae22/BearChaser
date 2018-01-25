@@ -166,6 +166,11 @@ namespace BearChaser.Test.Controllers.Api
         GoalId = 123
       };
 
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+
       // Act.
       var result = await testObject.CreateAttemptAsync(attempt);
 
@@ -335,6 +340,11 @@ namespace BearChaser.Test.Controllers.Api
       var userStore = Substitute.For<IUserStore>();
       var log = Substitute.For<ILogger>();
       var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
 
       // Act.
       var result = await testObject.DeleteAttemptAsync(123);
