@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
   <head>
+    <title>BearChaser</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -22,6 +23,7 @@
         <input id='startDate' type='text' value='2018/01/01' /><br />
         <input id='doAddGoal' type='button' value='Add' />
       </form>
+      <br />
       <p id='goalSection' />
     </div>
 
@@ -50,9 +52,8 @@
           var expiryTime = now.getTime() + (30 * 24 * 60 * 60 * 1000);
           now.setTime(expiryTime);
 
-          document.cookie = 'secure' + ';expires=' + now.toUTCString();
-          document.cookie = 'username=' + username + ';expires=' + now.toUTCString();
-          document.cookie = 'password=' + password + ';expires=' + now.toUTCString();
+          document.cookie = 'username=' + username + ';secure;expires=' + now.toUTCString();
+          document.cookie = 'password=' + password + ';secure;expires=' + now.toUTCString();
         
           $.post(
             '/api/users/login',
@@ -78,7 +79,7 @@
             headers: { 'auth': GetToken() },
             data: { 'Id': 0, 'Name': name, 'PeriodInHours': period, 'FrequencyWithinPeriod': frequency, 'StartDate': startDate },
             success: function () { GetAndPopulateGoals(); },
-            error: alert('Error adding goal.')
+            error: function (xhr, status, error) { alert('Error adding goal: ' + error); }
           });
         });
         
@@ -98,7 +99,7 @@
         var token = data.replace(/\"/g, '');
         console.log(token);
         
-        document.cookie = 'token=' + token;
+        document.cookie = 'token=' + token + ';secure';
       }
       
       function GetAndPopulateGoals()      
