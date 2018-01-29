@@ -101,6 +101,8 @@ namespace BearChaser.Controllers.Api
       var goalDatas = new List<GoalData>();
       goals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
 
+      goalDatas.Sort((g1, g2) => string.Compare(g1.Name, g2.Name));
+
       string serializeData = JsonConvert.SerializeObject(goalDatas);
 
       _log.LogDebug($"Retrieved user's goals {serializeData}.");

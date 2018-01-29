@@ -157,7 +157,7 @@ namespace BearChaser.Test.Controllers.Api
     //---------------------------------------------------------------------------------------------
 
     [Test]
-    public async Task GetGoalsAsync_GivenUserToken_ShouldReturnUsersGoals()
+    public async Task GetGoalsAsync_GivenUserToken_ShouldReturnUsersGoalsOrderAlphabetically()
     {
       // Arrange.
       MapperConfig.Initialise();
@@ -184,6 +184,14 @@ namespace BearChaser.Test.Controllers.Api
           Name = "Some Goal",
           PeriodInHours = 24,
           FrequencyWithinPeriod = 1
+        },
+        new Goal
+        {
+          Id = 11,
+          UserId = 123,
+          Name = "Another Goal",
+          PeriodInHours = 48,
+          FrequencyWithinPeriod = 1
         }
       };
 
@@ -197,6 +205,7 @@ namespace BearChaser.Test.Controllers.Api
 
       var goalDatas = new List<GoalData>
       {
+        Mapper.Map<GoalData>(goals[1]),
         Mapper.Map<GoalData>(goals[0])
       };
 
