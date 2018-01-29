@@ -263,6 +263,10 @@
     <Compile Include="Migrations\201801251357475_SpecifiedGoalStartDateColumnType.Designer.cs">
       <DependentUpon>201801251357475_SpecifiedGoalStartDateColumnType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.cs" />
+    <Compile Include="Migrations\201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.Designer.cs">
+      <DependentUpon>201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
     <Compile Include="Models\Goal.cs" />
@@ -385,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801251357475_SpecifiedGoalStartDateColumnType.resx">
       <DependentUpon>201801251357475_SpecifiedGoalStartDateColumnType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.resx">
+      <DependentUpon>201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

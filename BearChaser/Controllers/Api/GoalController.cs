@@ -182,7 +182,7 @@ namespace BearChaser.Controllers.Api
 
       var attempts = await _goalAttemptStore.GetAttemptsAsync(goalId);
       attempts = attempts.Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd);
-      
+
       var stats = new GoalPeriodStatsData
       {
         GoalId = goal.Id,
