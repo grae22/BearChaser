@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BearChaser.Models;
 
@@ -11,7 +12,8 @@ namespace BearChaser.Stores
     Task<Goal> CreateGoalAsync(int userId,
                                string name,
                                int periodInHours,
-                               int frequencyWithinPeriod);
+                               int frequencyWithinPeriod,
+                               DateTime startDate);
 
     Task RemoveGoalAsync(Goal goal);
     Task<IEnumerable<Goal>> GetGoalsAsync(int userId);

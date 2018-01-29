@@ -101,6 +101,8 @@ namespace BearChaser.Controllers.Api
       var goalDatas = new List<GoalData>();
       goals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
 
+      goalDatas.Sort((g1, g2) => string.Compare(g1.Name, g2.Name));
+
       string serializeData = JsonConvert.SerializeObject(goalDatas);
 
       _log.LogDebug($"Retrieved user's goals {serializeData}.");
@@ -135,13 +137,14 @@ namespace BearChaser.Controllers.Api
         user.Id,
         goalData.Name,
         goalData.PeriodInHours,
-        goalData.FrequencyWithinPeriod);
-
-      goalData.Id = goal.Id;
+        goalData.FrequencyWithinPeriod,
+        goalData.StartDate);
 
       _log.LogDebug($"Goal created: {goal}");
 
-      return Ok(JsonConvert.SerializeObject(goalData));
+      return Ok(
+        JsonConvert.SerializeObject(
+          Mapper.Map<GoalData>(goal)));
     }
 
     //---------------------------------------------------------------------------------------------

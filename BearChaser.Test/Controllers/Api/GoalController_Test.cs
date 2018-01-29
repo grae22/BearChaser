@@ -157,7 +157,7 @@ namespace BearChaser.Test.Controllers.Api
     //---------------------------------------------------------------------------------------------
 
     [Test]
-    public async Task GetGoalsAsync_GivenUserToken_ShouldReturnUsersGoals()
+    public async Task GetGoalsAsync_GivenUserToken_ShouldReturnUsersGoalsOrderAlphabetically()
     {
       // Arrange.
       MapperConfig.Initialise();
@@ -184,6 +184,14 @@ namespace BearChaser.Test.Controllers.Api
           Name = "Some Goal",
           PeriodInHours = 24,
           FrequencyWithinPeriod = 1
+        },
+        new Goal
+        {
+          Id = 11,
+          UserId = 123,
+          Name = "Another Goal",
+          PeriodInHours = 48,
+          FrequencyWithinPeriod = 1
         }
       };
 
@@ -197,6 +205,7 @@ namespace BearChaser.Test.Controllers.Api
 
       var goalDatas = new List<GoalData>
       {
+        Mapper.Map<GoalData>(goals[1]),
         Mapper.Map<GoalData>(goals[0])
       };
 
@@ -317,6 +326,7 @@ namespace BearChaser.Test.Controllers.Api
       var objects = CreateTestObjects();
       var guid = Guid.NewGuid();
       var userToken = new Token();
+      var now = DateTime.Now;
 
       objects.TestObject.ControllerContext = new HttpControllerContext
       {
@@ -334,12 +344,12 @@ namespace BearChaser.Test.Controllers.Api
         Name = "NewGoal",
         PeriodInHours = 24,
         FrequencyWithinPeriod = 2,
-        StartDate = DateTime.Now
+        StartDate = now
       };
 
       var returnedGoalData = Mapper.Map<GoalData>(returnedGoal);
 
-      objects.Goals.CreateGoalAsync(123, "NewGoal", 24, 2).Returns(returnedGoal);
+      objects.Goals.CreateGoalAsync(123, "NewGoal", 24, 2, now).Returns(returnedGoal);
 
       // Act.
       var result = await objects.TestObject.CreateGoalAsync(
@@ -352,7 +362,7 @@ namespace BearChaser.Test.Controllers.Api
         });
 
       // Assert.
-      await objects.Goals.Received(1).CreateGoalAsync(123, "NewGoal", 24, 2);
+      await objects.Goals.Received(1).CreateGoalAsync(123, "NewGoal", 24, 2, now);
 
       var okResult = result as OkNegotiatedContentResult<string>;
 
