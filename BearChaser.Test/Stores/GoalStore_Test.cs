@@ -21,11 +21,12 @@ namespace BearChaser.Test.Stores
       var goalDb = Substitute.For<IGoalDb>();
       var userStore = Substitute.For<IUserStore>();
       var testObject = new GoalStore(goalDb, userStore);
+      var now = DateTime.Now;
 
       userStore.GetUserAsync(0).Returns(new User());
 
       // Act.
-      Goal goal = await testObject.CreateGoalAsync(0, "SomeGoal", 24, 1);
+      Goal goal = await testObject.CreateGoalAsync(0, "SomeGoal", 24, 1, now);
 
       // Assert.
       goalDb.Received(1).AddGoal(Arg.Any<Goal>());
@@ -36,6 +37,7 @@ namespace BearChaser.Test.Stores
       Assert.AreEqual("SomeGoal", goal.Name);
       Assert.AreEqual(24, goal.PeriodInHours);
       Assert.AreEqual(1, goal.FrequencyWithinPeriod);
+      Assert.AreEqual(now, goal.StartDate);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ namespace BearChaser.Test.Stores
 
       // Act & assert.
       Assert.That(
-        () => testObject.CreateGoalAsync(0, "SomeGoal", 24, 1),
+        () => testObject.CreateGoalAsync(0, "SomeGoal", 24, 1, DateTime.Now),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("User not found with id 0."));
@@ -72,7 +74,7 @@ namespace BearChaser.Test.Stores
 
       // Act & assert.
       Assert.That(
-        () => testObject.CreateGoalAsync(0, name, 24, 1),
+        () => testObject.CreateGoalAsync(0, name, 24, 1, DateTime.Now),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("Goal name cannot be blank or null."));
@@ -92,7 +94,7 @@ namespace BearChaser.Test.Stores
 
       // Act & assert.
       Assert.That(
-        () => testObject.CreateGoalAsync(0, "SomeGoal", 0, 1),
+        () => testObject.CreateGoalAsync(0, "SomeGoal", 0, 1, DateTime.Now),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("Invalid period value 0."));
@@ -114,7 +116,7 @@ namespace BearChaser.Test.Stores
 
       // Act & assert.
       Assert.That(
-        () => testObject.CreateGoalAsync(0, "SomeGoal", 24, frequency),
+        () => testObject.CreateGoalAsync(0, "SomeGoal", 24, frequency, DateTime.Now),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo($"Frequency cannot be zero or negative, was {frequency}."));

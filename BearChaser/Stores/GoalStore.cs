@@ -27,7 +27,8 @@ namespace BearChaser.Stores
     public async Task<Goal> CreateGoalAsync(int userId,
                                             string name,
                                             int periodInHours,
-                                            int frequencyWithinPeriod)
+                                            int frequencyWithinPeriod,
+                                            DateTime startDate)
     {
       await ValidateUserExists(userId);
       ValidateGoalName(name);
@@ -39,7 +40,8 @@ namespace BearChaser.Stores
         Name = name,
         UserId = userId,
         PeriodInHours = periodInHours,
-        FrequencyWithinPeriod = frequencyWithinPeriod
+        FrequencyWithinPeriod = frequencyWithinPeriod,
+        StartDate = startDate
       };
 
       _goalDb.AddGoal(goal);

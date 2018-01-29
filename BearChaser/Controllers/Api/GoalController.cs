@@ -137,13 +137,14 @@ namespace BearChaser.Controllers.Api
         user.Id,
         goalData.Name,
         goalData.PeriodInHours,
-        goalData.FrequencyWithinPeriod);
-
-      goalData.Id = goal.Id;
+        goalData.FrequencyWithinPeriod,
+        goalData.StartDate);
 
       _log.LogDebug($"Goal created: {goal}");
 
-      return Ok(JsonConvert.SerializeObject(goalData));
+      return Ok(
+        JsonConvert.SerializeObject(
+          Mapper.Map<GoalData>(goal)));
     }
 
     //---------------------------------------------------------------------------------------------
