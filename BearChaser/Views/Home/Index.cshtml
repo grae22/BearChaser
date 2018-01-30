@@ -180,7 +180,8 @@
         
         $('#attemptsForGoal' + goalId).append(
           stats.AttemptCount + '/' + stats.TargetAttemptCount + ' ' +
-          '(' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ')');
+          '(' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ') ' +
+          '(' + stats.AverageCompletionAcrossAllPeriods + '%)');
       }
       
       function CreateGoalAttempt(goalId)
