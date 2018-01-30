@@ -66,7 +66,7 @@ namespace BearChaser.Migrations
             "SELECT AVG(periodCount) " +
             "FROM #AttemptCounts); " +
 
-          "SELECT(@avgAttemptsPerPeriod / @targetAttemptCount) * 100; " +
+          "SELECT(CAST((@avgAttemptsPerPeriod / @targetAttemptCount) * 100 AS int); " +
         "END");
     }
 

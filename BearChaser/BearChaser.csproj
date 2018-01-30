@@ -19,10 +19,10 @@
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>60290</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -198,6 +198,7 @@
     <Compile Include="DataTransferObjects\GoalPeriodStatsData.cs" />
     <Compile Include="DataTransferObjects\UserLoginData.cs" />
     <Compile Include="Controllers\Api\UserController.cs" />
+    <Compile Include="Db\IDbQuery.cs" />
     <Compile Include="Db\IGoalAttemptDb.cs" />
     <Compile Include="Exceptions\InternalServerException.cs" />
     <Compile Include="Global.asax.cs">
