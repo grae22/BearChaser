@@ -10,6 +10,7 @@ using NSubstitute;
 using Newtonsoft.Json;
 using BearChaser.Controllers.Api;
 using BearChaser.DataTransferObjects;
+using BearChaser.Db;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils;
@@ -29,6 +30,7 @@ namespace BearChaser.Test.Controllers.Api
       public IGoalAttemptStore Attempts { get; set; }
       public IUserStore Users { get; set; }
       public ITokenStore Tokens { get; set; }
+      public IDbQuery DbQuery { get; set; }
       public IDateTimeSource DateTime { get; set; }
       public ILogger Log { get; set; }
       public GoalController TestObject { get; set; }
@@ -43,12 +45,13 @@ namespace BearChaser.Test.Controllers.Api
       var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
       var userStore = Substitute.For<IUserStore>();
       var tokenStore = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(null, goalAttemptStore, userStore, tokenStore, dateTime, log),
+        () => new GoalController(null, goalAttemptStore, userStore, tokenStore, dbQuery, dateTime, log),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("GoalStore cannot be null."));
@@ -63,12 +66,13 @@ namespace BearChaser.Test.Controllers.Api
       var goalStore = Substitute.For<IGoalStore>();
       var userStore = Substitute.For<IUserStore>();
       var tokenStore = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(goalStore, null, userStore, tokenStore, dateTime, log),
+        () => new GoalController(goalStore, null, userStore, tokenStore, dbQuery, dateTime, log),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("GoalAttemptStore cannot be null."));
@@ -83,12 +87,13 @@ namespace BearChaser.Test.Controllers.Api
       var goalStore = Substitute.For<IGoalStore>();
       var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
       var tokenStore = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(goalStore, goalAttemptStore, null, tokenStore, dateTime, log),
+        () => new GoalController(goalStore, goalAttemptStore, null, tokenStore, dbQuery, dateTime, log),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("UserStore cannot be null."));
@@ -103,15 +108,37 @@ namespace BearChaser.Test.Controllers.Api
       var goalStore = Substitute.For<IGoalStore>();
       var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
       var userStore = Substitute.For<IUserStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(goalStore, goalAttemptStore, userStore, null, dateTime, log),
+        () => new GoalController(goalStore, goalAttemptStore, userStore, null, dbQuery, dateTime, log),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("TokenStore cannot be null."));
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public void Constructor_GivenNullDbQuery_ShouldRaiseException()
+    {
+      // Arrange.
+      var goalStore = Substitute.For<IGoalStore>();
+      var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var dateTime = Substitute.For<IDateTimeSource>();
+      var log = Substitute.For<ILogger>();
+
+      // Act & Assert.
+      Assert.That(
+        () => new GoalController(goalStore, goalAttemptStore, userStore, tokenStore, null, dateTime, log),
+        Throws
+          .TypeOf<ArgumentException>()
+          .With.Message.EqualTo("DbQuery cannot be null."));
     }
 
     //---------------------------------------------------------------------------------------------
@@ -124,11 +151,12 @@ namespace BearChaser.Test.Controllers.Api
       var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
       var userStore = Substitute.For<IUserStore>();
       var tokenStore = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var log = Substitute.For<ILogger>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(goalStore, goalAttemptStore, userStore, tokenStore, null, log),
+        () => new GoalController(goalStore, goalAttemptStore, userStore, tokenStore, dbQuery, null, log),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("DateTimeSource cannot be null."));
@@ -144,11 +172,12 @@ namespace BearChaser.Test.Controllers.Api
       var goalAttemptStore = Substitute.For<IGoalAttemptStore>();
       var userStore = Substitute.For<IUserStore>();
       var tokenStore = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
 
       // Act & Assert.
       Assert.That(
-        () => new GoalController(goalStore, goalAttemptStore, userStore, tokenStore, dateTime, null),
+        () => new GoalController(goalStore, goalAttemptStore, userStore, tokenStore, dbQuery, dateTime, null),
         Throws
           .TypeOf<ArgumentException>()
           .With.Message.EqualTo("Logger cannot be null."));
@@ -693,6 +722,8 @@ namespace BearChaser.Test.Controllers.Api
         }
       });
 
+      objects.DbQuery.ExecuteSql<int>(Arg.Any<string>()).Returns(new List<int> { 100 });
+
       // Act.
       var result = await objects.TestObject.GetPeriodStatsAsync(123);
 
@@ -711,6 +742,7 @@ namespace BearChaser.Test.Controllers.Api
       Assert.AreEqual(endOfDay, stats.PeriodEnd);
       Assert.AreEqual(1, stats.AttemptCount);
       Assert.AreEqual(2, stats.TargetAttemptCount);
+      Assert.AreEqual(100, stats.AverageCompletionAcrossAllPeriods);
     }
 
     //=============================================================================================
@@ -721,6 +753,7 @@ namespace BearChaser.Test.Controllers.Api
       var attempts = Substitute.For<IGoalAttemptStore>();
       var users = Substitute.For<IUserStore>();
       var tokens = Substitute.For<ITokenStore>();
+      var dbQuery = Substitute.For<IDbQuery>();
       var dateTime = Substitute.For<IDateTimeSource>();
       var log = Substitute.For<ILogger>();
 
@@ -730,9 +763,10 @@ namespace BearChaser.Test.Controllers.Api
         Attempts = attempts,
         Users = users,
         Tokens = tokens,
+        DbQuery = dbQuery,
         DateTime = dateTime,
         Log = log,
-        TestObject = new GoalController(goals, attempts, users, tokens, dateTime, log)
+        TestObject = new GoalController(goals, attempts, users, tokens, dbQuery, dateTime, log)
       };
     }
 

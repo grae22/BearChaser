@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using WebGrease.Css.Extensions;
 using BearChaser.Controllers.Utils;
 using BearChaser.DataTransferObjects;
+using BearChaser.Db;
 using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
@@ -25,6 +26,7 @@ namespace BearChaser.Controllers.Api
     private readonly IGoalAttemptStore _goalAttemptStore;
     private readonly IUserStore _userStore;
     private readonly ITokenStore _tokenStore;
+    private readonly IDbQuery _dbQuery;
     private readonly IDateTimeSource _dateTime;
     private readonly ILogger _log;
 
@@ -34,6 +36,7 @@ namespace BearChaser.Controllers.Api
                           IGoalAttemptStore goalAttemptStore,
                           IUserStore userStore,
                           ITokenStore tokenStore,
+                          IDbQuery dbQuery,
                           IDateTimeSource dateTime,
                           ILogger log)
     {
@@ -57,6 +60,11 @@ namespace BearChaser.Controllers.Api
         throw new ArgumentException("TokenStore cannot be null.");
       }
 
+      if (dbQuery == null)
+      {
+        throw new ArgumentException("DbQuery cannot be null.");
+      }
+
       if (dateTime == null)
       {
         throw new ArgumentException("DateTimeSource cannot be null.");
@@ -71,6 +79,7 @@ namespace BearChaser.Controllers.Api
       _goalAttemptStore = goalAttemptStore;
       _userStore = userStore;
       _tokenStore = tokenStore;
+      _dbQuery = dbQuery;
       _dateTime = dateTime;
       _log = log;
     }
@@ -182,14 +191,18 @@ namespace BearChaser.Controllers.Api
 
       var attempts = await _goalAttemptStore.GetAttemptsAsync(goalId);
       attempts = attempts.Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd);
-      
+
+      var avgPercentCompleteAcrossPeriods =
+        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
+
       var stats = new GoalPeriodStatsData
       {
         GoalId = goal.Id,
         PeriodStart = periodStart,
         PeriodEnd = periodEnd,
         AttemptCount = attempts.Count(),
-        TargetAttemptCount = goal.FrequencyWithinPeriod
+        TargetAttemptCount = goal.FrequencyWithinPeriod,
+        AverageCompletionAcrossAllPeriods = avgPercentCompleteAcrossPeriods[0]
       };
 
       _log.LogDebug($"Retrieved stats for user {user.Id}, goal {goalId} : {JsonConvert.SerializeObject(stats)}");

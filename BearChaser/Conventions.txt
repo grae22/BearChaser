@@ -1,1 +1,9 @@
-﻿x All internal date handling should use UTC dates.
+﻿General
+-------
+x All internal date handling should use UTC dates.
+
+Db Error Codes
+--------------
+1000 : Goal not found.
+1001 : Invalid period length (zero or negative).
+1002 : Invalid target attempt frequency (zero or negative).

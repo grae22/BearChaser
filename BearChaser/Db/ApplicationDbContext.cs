@@ -8,7 +8,7 @@ using BearChaser.Models;
 
 namespace BearChaser.Db
 {
-  internal class ApplicationDbContext : DbContext, ITokenDb, IGoalDb, IGoalAttemptDb
+  internal class ApplicationDbContext : DbContext, ITokenDb, IGoalDb, IGoalAttemptDb, IDbQuery
   {
     //---------------------------------------------------------------------------------------------
 
@@ -123,6 +123,13 @@ namespace BearChaser.Db
     public async Task<GoalAttempt> GetAttemptAsync(int attemptId)
     {
       return await GoalAttempts.FirstOrDefaultAsync(a => a.Id == attemptId);
+    }
+
+    // IDbQuery ===================================================================================
+
+    public async Task<List<T>> ExecuteSql<T>(string sql)
+    {
+      return await Database.SqlQuery<T>(sql).ToListAsync();
     }
 
     // Common =====================================================================================
