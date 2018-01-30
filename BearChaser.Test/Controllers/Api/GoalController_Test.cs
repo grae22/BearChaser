@@ -743,6 +743,7 @@ namespace BearChaser.Test.Controllers.Api
       Assert.AreEqual(1, stats.AttemptCount);
       Assert.AreEqual(2, stats.TargetAttemptCount);
       Assert.AreEqual(100, stats.AverageCompletionAcrossAllPeriods);
+      Assert.AreEqual(100, stats.AverageCompletionAcrossLast3Periods);
     }
 
     //=============================================================================================

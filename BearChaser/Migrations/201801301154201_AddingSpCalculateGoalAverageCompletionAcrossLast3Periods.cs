@@ -2,14 +2,12 @@ namespace BearChaser.Migrations
 {
   using System.Data.Entity.Migrations;
 
-  public partial class UpdatedSpCalculateGoalAverageCompletionAcrossPeriods : DbMigration
+  public partial class AddingSpCalculateGoalAverageCompletionAcrossLast3Periods : DbMigration
   {
     public override void Up()
     {
-      DropStoredProcedure("dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods");
-
       Sql(
-        "CREATE PROCEDURE dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods " +
+        "CREATE PROCEDURE dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods " +
           "@goalId int " +
         "AS " +
         "BEGIN " +
@@ -43,10 +41,11 @@ namespace BearChaser.Migrations
 
           "CREATE TABLE #AttemptCounts " +
           "( " +
+            "id int IDENTITY(1,1), " +
             "periodCount int " +
           "); " +
 
-          "WHILE @periodStart < DATEADD(hh, @periodInHours, @now) " +
+          "WHILE @periodStart < @now " +
           "BEGIN " +
             "DECLARE @periodEnd datetime = DATEADD(hh, @periodInHours, @periodStart); " +
             "SET @periodEnd = DATEADD(s, -1, @periodEnd); " +
@@ -59,22 +58,25 @@ namespace BearChaser.Migrations
                 "Timestamp BETWEEN @periodStart AND @periodEnd); " +
 
             "INSERT INTO #AttemptCounts " +
-            "VALUES(CAST(@attemptCount AS float)); " +
+            "VALUES(@attemptCount); " +
 
             "SET @periodStart = DATEADD(hh, @periodInHours, @periodStart); " +
           "END " +
 
-          "DECLARE @avgAttemptsPerPeriod float = ( " +
-            "SELECT AVG(periodCount) " +
-            "FROM #AttemptCounts); " +
+          "DECLARE @avgAttemptsForLast3Periods float = ( " +
+            "SELECT AVG(CAST(LastPeriodCounts.periodCount AS float)) " +
+            "FROM ( " +
+              "SELECT TOP(3) periodCount " +
+              "FROM #AttemptCounts " +
+              "ORDER BY id DESC) LastPeriodCounts) " +
 
-          "SELECT CAST((@avgAttemptsPerPeriod / @targetAttemptCount) * 100 AS int); " +
+          "SELECT CAST((@avgAttemptsForLast3Periods / @targetAttemptCount) * 100 AS int); " +
         "END");
-      }
+    }
 
-      public override void Down()
-      {
-        DropStoredProcedure("dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods");
-      }
+    public override void Down()
+    {
+      DropStoredProcedure("dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods");
     }
   }
+}

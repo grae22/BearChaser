@@ -12,6 +12,7 @@ namespace BearChaser.DataTransferObjects
     public int AttemptCount { get; set; }
     public int TargetAttemptCount { get; set; }
     public int AverageCompletionAcrossAllPeriods { get; set; }
+    public int AverageCompletionAcrossLast3Periods { get; set; }
 
     //---------------------------------------------------------------------------------------------
   }

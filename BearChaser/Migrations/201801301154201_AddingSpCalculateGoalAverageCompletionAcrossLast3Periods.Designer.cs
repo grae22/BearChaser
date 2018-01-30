@@ -7,13 +7,13 @@ namespace BearChaser.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class UpdatedSpCalculateGoalAverageCompletionAcrossPeriods : IMigrationMetadata
+    public sealed partial class AddingSpCalculateGoalAverageCompletionAcrossLast3Periods : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UpdatedSpCalculateGoalAverageCompletionAcrossPeriods));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddingSpCalculateGoalAverageCompletionAcrossLast3Periods));
         
         string IMigrationMetadata.Id
         {
-            get { return "201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods"; }
+            get { return "201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods"; }
         }
         
         string IMigrationMetadata.Source

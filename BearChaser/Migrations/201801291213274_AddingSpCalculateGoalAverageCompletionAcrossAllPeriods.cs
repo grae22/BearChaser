@@ -57,13 +57,13 @@ namespace BearChaser.Migrations
                 "Timestamp BETWEEN @periodStart AND @periodEnd); " +
  
             "INSERT INTO #AttemptCounts " +
-            "VALUES(CAST(@attemptCount AS float)); " +
+            "VALUES(@attemptCount); " +
 
             "SET @periodStart = DATEADD(hh, @periodInHours, @periodStart); " +
           "END " +
 
           "DECLARE @avgAttemptsPerPeriod float = ( " +
-            "SELECT AVG(periodCount) " +
+            "SELECT AVG(CAST(periodCount AS float)) " +
             "FROM #AttemptCounts); " +
 
           "SELECT CAST((@avgAttemptsPerPeriod / @targetAttemptCount) * 100 AS int); " +
