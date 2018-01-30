@@ -180,8 +180,9 @@
         
         $('#attemptsForGoal' + goalId).append(
           stats.AttemptCount + '/' + stats.TargetAttemptCount + ' ' +
-          '(' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ') ' +
-          '(' + stats.AverageCompletionAcrossAllPeriods + '%)');
+          '| ' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ' | ' +
+          stats.AverageCompletionAcrossLast3Periods + '% - ' +
+          stats.AverageCompletionAcrossAllPeriods + '%');
       }
       
       function CreateGoalAttempt(goalId)
@@ -197,7 +198,7 @@
       }
       
       function GetCookie(name)
-      {console.log(document.cookie);
+      {
         var re = new RegExp(name + "=([^;]+)");
         var value = re.exec(document.cookie);
         return (value != null) ? unescape(value[1]) : null;
@@ -206,7 +207,7 @@
       function GetToken()
       {
         return GetCookie('token');
-      }
+      }      
     </script
   </body>
 </html>

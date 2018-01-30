@@ -195,6 +195,9 @@ namespace BearChaser.Controllers.Api
       var avgPercentCompleteAcrossPeriods =
         await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
 
+      var avgPercentCompleteAcrossLast3Periods =
+        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods {goalId}");
+
       var stats = new GoalPeriodStatsData
       {
         GoalId = goal.Id,
@@ -202,7 +205,8 @@ namespace BearChaser.Controllers.Api
         PeriodEnd = periodEnd,
         AttemptCount = attempts.Count(),
         TargetAttemptCount = goal.FrequencyWithinPeriod,
-        AverageCompletionAcrossAllPeriods = avgPercentCompleteAcrossPeriods[0]
+        AverageCompletionAcrossAllPeriods = avgPercentCompleteAcrossPeriods[0],
+        AverageCompletionAcrossLast3Periods = avgPercentCompleteAcrossLast3Periods[0]
       };
 
       _log.LogDebug($"Retrieved stats for user {user.Id}, goal {goalId} : {JsonConvert.SerializeObject(stats)}");

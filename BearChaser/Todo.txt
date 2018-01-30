@@ -1,4 +1,3 @@
-﻿x Expose basic stats for goal attempts.
-x Mechanism for renewing/replacing user token.
+﻿x Mechanism for renewing/replacing user token.
 x Support for 'do less' - in addition to recording 'attempts' to reflect action, may want to (positively) reflect lack of action (e.g. quitting smoking).
 x Share summary to fb.

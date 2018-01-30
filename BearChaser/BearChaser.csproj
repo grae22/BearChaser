@@ -268,9 +268,9 @@
     <Compile Include="Migrations\201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.Designer.cs">
       <DependentUpon>201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods.cs" />
-    <Compile Include="Migrations\201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods.Designer.cs">
-      <DependentUpon>201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods.cs</DependentUpon>
+    <Compile Include="Migrations\201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.cs" />
+    <Compile Include="Migrations\201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.Designer.cs">
+      <DependentUpon>201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
@@ -398,8 +398,8 @@
     <EmbeddedResource Include="Migrations\201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.resx">
       <DependentUpon>201801291213274_AddingSpCalculateGoalAverageCompletionAcrossAllPeriods.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods.resx">
-      <DependentUpon>201801300740391_UpdatedSpCalculateGoalAverageCompletionAcrossPeriods.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.resx">
+      <DependentUpon>201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
