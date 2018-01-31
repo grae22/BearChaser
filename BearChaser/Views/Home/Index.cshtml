@@ -181,9 +181,9 @@
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control"><tr>' +
-          '<td><span class="text-nowrap">(' + stats.AttemptCount + '/' + stats.TargetAttemptCount + ')</span></td>' +
-          '<td><span class="text-nowrap">' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</span></td>' +
-          '<td><span class="text-nowrap">(' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%)</span></td>' +
+          '<td><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
+          '<td><span class="text-nowrap small">' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</span></td>' +
+          '<td><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
           '</tr></table>');
       }
       
