@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
+using Newtonsoft.Json;
 using BearChaser.Controllers.Utils;
 using BearChaser.DataTransferObjects;
 using BearChaser.Exceptions;
 using BearChaser.Models;
 using BearChaser.Stores;
 using BearChaser.Utils.Logging;
-using Newtonsoft.Json;
-using WebGrease.Css.Extensions;
 
 namespace BearChaser.Controllers.Api
 {
@@ -68,10 +69,14 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // POST: api/goalAttempts
+
     [HttpPost]
-    [Route("api/goalAttempts/create")]
+    [Route("api/goalAttempts")]
     public async Task<IHttpActionResult> CreateAttemptAsync(GoalAttemptData attempt)
     {
+      _log.LogDebug($"Request: {JsonConvert.SerializeObject(attempt)}");
+
       User user;
 
       try
@@ -104,10 +109,14 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // DELETE: api/goalAttempts?attemptId=123
+
     [HttpDelete]
     [Route("api/goalAttempts")]
     public async Task<IHttpActionResult> DeleteAttemptAsync(int attemptId)
     {
+      _log.LogDebug($"Request: attemptId={attemptId}");
+
       User user;
 
       try
@@ -141,17 +150,21 @@ namespace BearChaser.Controllers.Api
 
       await _attemptStore.RemoveAttemptAsync(attemptId);
 
-      _log.LogInfo($"Created goal-attempt {attemptId} for user {user.Id}.");
-
+      _log.LogInfo($"Deleted goal-attempt {attemptId} for user {user.Id}.");
+      
       return Ok();
     }
 
     //---------------------------------------------------------------------------------------------
 
-    [HttpGet]
+    // DELETE: api/goalAttempts?goalId=123
+
+    [HttpDelete]
     [Route("api/goalAttempts")]
-    public async Task<IHttpActionResult> GetAttemptsAsync(int goalId)
+    public async Task<IHttpActionResult> DeleteLastAttemptAsync(int goalId)
     {
+      _log.LogDebug($"Request: goalId={goalId}");
+
       User user;
 
       try
@@ -175,7 +188,52 @@ namespace BearChaser.Controllers.Api
         return NotFound();
       }
 
-      var attempts = await _attemptStore.GetAttemptsAsync(goalId);
+      GoalAttempt lastAttempt =
+        await _attemptStore.GetAttempts(goalId)
+          .OrderByDescending(a => a.Timestamp)
+          .FirstOrDefaultAsync();
+      
+      await _attemptStore.RemoveAttemptAsync(lastAttempt.Id);
+
+      _log.LogInfo($"Deleted goal-attempt {lastAttempt.Id} for user {user.Id}.");
+      
+      return Ok();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    // GET: api/goalAttempts?goalId=123
+
+    [HttpGet]
+    [Route("api/goalAttempts")]
+    public async Task<IHttpActionResult> GetAttemptsAsync(int goalId)
+    {
+      _log.LogDebug($"Request: goalId={goalId}");
+
+      User user;
+
+      try
+      {
+        user = await ControllerUtils.GetUserForRequestHeaderTokenAsync(this, _tokenStore, _userStore, _log);
+      }
+      catch (AuthenticationException ex)
+      {
+        return BadRequest(ex.Message);
+      }
+      catch (InternalServerException)
+      {
+        return InternalServerError();
+      }
+
+      Goal goal = await _goalStore.GetGoalAsync(goalId);
+
+      if (goal == null || goal.UserId != user.Id)
+      {
+        _log.LogDebug($"Goal not found with id {goalId} for user {user.Id}.");
+        return NotFound();
+      }
+
+      var attempts = await _attemptStore.GetAttempts(goalId).ToListAsync();
 
       var attemptDatas = new List<GoalAttemptData>();
       attempts.ForEach(a => attemptDatas.Add(Mapper.Map<GoalAttemptData>(a)));

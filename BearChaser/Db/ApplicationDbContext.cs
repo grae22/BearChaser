@@ -113,9 +113,9 @@ namespace BearChaser.Db
 
     //---------------------------------------------------------------------------------------------
 
-    public async Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId)
+    public IQueryable<GoalAttempt> GetAttempts(int goalId)
     {
-      return await GoalAttempts.Where(g => g.GoalId == goalId).ToListAsync();
+      return GoalAttempts.Where(g => g.GoalId == goalId);
     }
 
     //---------------------------------------------------------------------------------------------

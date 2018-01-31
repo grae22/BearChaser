@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -86,6 +87,8 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // GET: api/goals
+
     [HttpGet]
     [Route("api/goals")]
     public async Task<IHttpActionResult> GetGoalsAsync()
@@ -121,8 +124,10 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // POST: api/goals
+
     [HttpPost]
-    [Route("api/goals/create")]
+    [Route("api/goals")]
     public async Task<IHttpActionResult> CreateGoalAsync(GoalData goalData)
     {
       _log.LogDebug($"Request: {JsonConvert.SerializeObject(goalData)}");
@@ -158,6 +163,8 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // GET: api/goals/periodStats?goalId=123
+
     [HttpGet]
     [Route("api/goals/periodStats")]
     public async Task<IHttpActionResult> GetPeriodStatsAsync(int goalId)
@@ -189,8 +196,11 @@ namespace BearChaser.Controllers.Api
 
       GetPeriodBoundsForTime(goal, _dateTime.Now, out DateTime periodStart, out DateTime periodEnd);
 
-      var attempts = await _goalAttemptStore.GetAttemptsAsync(goalId);
-      attempts = attempts.Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd);
+      var attempts = await
+        _goalAttemptStore
+          .GetAttempts(goalId)
+          .Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd)
+          .ToListAsync();
 
       var avgPercentCompleteAcrossPeriods =
         await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");

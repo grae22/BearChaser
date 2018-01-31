@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BearChaser.Db;
 using BearChaser.Models;
@@ -55,9 +55,9 @@ namespace BearChaser.Stores
 
     //---------------------------------------------------------------------------------------------
 
-    public async Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId)
+    public IQueryable<GoalAttempt> GetAttempts(int goalId)
     {
-      return await _goalAttemptDb.GetAttemptsAsync(goalId);
+      return _goalAttemptDb.GetAttempts(goalId);
     }
 
     //---------------------------------------------------------------------------------------------

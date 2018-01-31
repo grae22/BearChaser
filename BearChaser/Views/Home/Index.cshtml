@@ -94,7 +94,7 @@
           var startDate = $('#startDate').val();
         
           $.ajax({
-            url: '/api/goals/create',
+            url: '/api/goals',
             type: 'POST',
             headers: { 'auth': GetToken() },
             data: { 'Id': 0, 'Name': name, 'PeriodInHours': period, 'FrequencyWithinPeriod': frequency, 'StartDate': startDate },
@@ -148,13 +148,14 @@
         $.each(goals, function(i, e)
         {
           content +=
-            "<tr><td>" + e.Name + "</td><td><input id='goalAttempt" + e.Id +
-            "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' />" +
-            " <span id='attemptsForGoal" + e.Id + "' /></td></tr>";
+            "<tr><td>" + e.Name + "</td>" +
+            "<td><input id='goalAttempt" + e.Id + "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' /></td>" +
+            "<td><span id='statsPlaceholderForGoal" + e.Id + "' /></td>" +
+            "<td><input id='removeLastAttempt" + e.Id + "' type='button' value='-' onclick='RemoveLastGoalAttempt(" + e.Id + ")' /></td>" +
+            "</tr>";
         });
         
-        $('#goalSection').empty();
-        $('#goalSection').append(content);
+        $('#goalSection').html(content);
         
         $.each(goals, function(i, e)
         {
@@ -177,23 +178,40 @@
       function PopulateStats(data, goalId)
       {
         var stats = JSON.parse(data);
-        
-        $('#attemptsForGoal' + goalId).append(
-          stats.AttemptCount + '/' + stats.TargetAttemptCount + ' ' +
-          '| ' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ' | ' +
-          stats.AverageCompletionAcrossLast3Periods + '% - ' +
-          stats.AverageCompletionAcrossAllPeriods + '%');
+       
+        $('#statsPlaceholderForGoal' + goalId).html(
+          '<table cellPadding="3" class="form-control"><tr>' +
+          '<td>(' + stats.AttemptCount + '/' + stats.TargetAttemptCount + ')</td>' +
+          '<td>' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</td>' +
+          '<td>(' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%)</td>' +
+          '</tr></table>');
       }
       
       function CreateGoalAttempt(goalId)
       {
         $.ajax({
-          url: '/api/goalAttempts/create',
+          url: '/api/goalAttempts',
           type: 'POST',
           headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
-          success: function () { console.log('Added goal-attempt.'); GetAndPopulateGoals(); },
+          success: function () { console.log('Added goal-attempt.'); GetAndPopulateStats(goalId); },
           error: function (xhr, status, error) { alert('Error adding goal-attempt: ' + error); }
+        });
+      }
+
+      function RemoveLastGoalAttempt(goalId)
+      {
+        if (confirm('Delete the last goal attempt?') == false)
+        {
+          return;
+        }
+      
+        $.ajax({
+          url: '/api/goalAttempts?goalId=' + goalId,
+          type: 'DELETE',
+          headers: { 'auth': GetToken() },
+          success: function () { console.log('Removed goal-attempt.'); GetAndPopulateStats(goalId); },
+          error: function (xhr, status, error) { alert('Error removing last goal-attempt: ' + error); }
         });
       }
       

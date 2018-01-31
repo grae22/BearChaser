@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using BearChaser.Models;
 
@@ -10,7 +10,7 @@ namespace BearChaser.Db
 
     void AddAttempt(GoalAttempt goal);
     Task RemoveAttempt(int attemptId);
-    Task<IEnumerable<GoalAttempt>> GetAttemptsAsync(int goalId);
+    IQueryable<GoalAttempt> GetAttempts(int goalId);
     Task<GoalAttempt> GetAttemptAsync(int attemptId);
     Task SaveAsync();
 

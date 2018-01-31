@@ -81,7 +81,7 @@ namespace BearChaser.Test.Stores
     //---------------------------------------------------------------------------------------------
 
     [Test]
-    public async Task GetAttemptsAsync_GivenGoalId_ShouldQueryDb()
+    public void GetAttemptsAsync_GivenGoalId_ShouldQueryDb()
     {
       // Arrange.
       var attemptDb = Substitute.For<IGoalAttemptDb>();
@@ -90,10 +90,10 @@ namespace BearChaser.Test.Stores
       var testObject = new GoalAttemptStore(attemptDb, goalStore, dateTimeSource);
 
       // Act.
-      await testObject.GetAttemptsAsync(0);
+      testObject.GetAttempts(0);
 
       // Assert.
-      await attemptDb.Received(1).GetAttemptsAsync(0);
+      attemptDb.Received(1).GetAttempts(0);
     }
 
     //---------------------------------------------------------------------------------------------

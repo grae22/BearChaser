@@ -13,6 +13,7 @@ using BearChaser.Controllers.Api;
 using BearChaser.DataTransferObjects;
 using BearChaser.Models;
 using BearChaser.Stores;
+using BearChaser.Test.TestUtils;
 using BearChaser.Utils.Logging;
 
 namespace BearChaser.Test.Controllers.Api
@@ -453,6 +454,183 @@ namespace BearChaser.Test.Controllers.Api
     }
 
     //---------------------------------------------------------------------------------------------
+    
+    [Test]
+    public async Task DeleteLastAttemptAsync_GivenValidAttempt_ShouldRemoveFromDb()
+    {
+      // Arrange.
+      var attemptStore = Substitute.For<IGoalAttemptStore>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+      var user = new User { Id = 1 };
+      var goal = new Goal { UserId = 1 };
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", Guid.NewGuid().ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(Arg.Any<Guid>()).Returns(new Token());
+      userStore.GetUserAsync(Arg.Any<Token>()).Returns(user);
+      goalStore.GetGoalAsync(Arg.Any<int>()).Returns(goal);
+
+      attemptStore.GetAttempts(101).Returns(
+        new MockDbAsyncEnumerable<GoalAttempt>(
+          new List<GoalAttempt>
+          {
+            new GoalAttempt
+            {
+              Id = 2,
+              Timestamp = new DateTime(2018, 1, 2),
+            },
+            new GoalAttempt
+            {
+              Id = 1,
+              Timestamp = new DateTime(2018, 1, 1)
+            }
+          }));
+
+      // Act.
+      var result = await testObject.DeleteLastAttemptAsync(101);
+
+      // Assert.
+      var okResult = result as OkResult;
+
+      Assert.NotNull(okResult);
+
+      await attemptStore.Received(0).RemoveAttemptAsync(1);
+      await attemptStore.Received(1).RemoveAttemptAsync(2);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task DeleteLastAttemptAsync_GivenNoAuthToken_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var attemptStore = Substitute.For<IGoalAttemptStore>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+
+      // Act.
+      var result = await testObject.DeleteLastAttemptAsync(123);
+
+      // Assert.
+      var badRequestResult = result as BadRequestErrorMessageResult;
+
+      Assert.NotNull(badRequestResult);
+      Assert.AreEqual("No token provided.", badRequestResult.Message);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task DeleteLastAttemptAsync_GivenValidTokenButNoUser_ShouldReturnInternalServerError()
+    {
+      // Arrange.
+      var attemptStore = Substitute.For<IGoalAttemptStore>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", Guid.NewGuid().ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(Arg.Any<Guid>()).Returns(new Token());
+
+      // Act.
+      var result = await testObject.DeleteLastAttemptAsync(123);
+
+      // Assert.
+      var serverErrorResult = result as InternalServerErrorResult;
+
+      Assert.NotNull(serverErrorResult);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task DeleteLastAttemptAsync_GivenUnknownGoalId_ShouldReturnNotFound()
+    {
+      // Arrange.
+      var attemptStore = Substitute.For<IGoalAttemptStore>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", Guid.NewGuid().ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(Arg.Any<Guid>()).Returns(new Token());
+      userStore.GetUserAsync(Arg.Any<Token>()).Returns(new User());
+      attemptStore.GetAttemptAsync(123).Returns(new GoalAttempt());
+
+      // Act.
+      var result = await testObject.DeleteLastAttemptAsync(123);
+
+      // Assert.
+      var notFoundResult = result as NotFoundResult;
+
+      Assert.NotNull(notFoundResult);
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    [Test]
+    public async Task DeleteLastAttemptAsync_GivenAnotherUsersGoal_ShouldReturnBadRequest()
+    {
+      // Arrange.
+      var attemptStore = Substitute.For<IGoalAttemptStore>();
+      var goalStore = Substitute.For<IGoalStore>();
+      var tokenStore = Substitute.For<ITokenStore>();
+      var userStore = Substitute.For<IUserStore>();
+      var log = Substitute.For<ILogger>();
+      var testObject = new GoalAttemptController(attemptStore, goalStore, tokenStore, userStore, log);
+      var currentUser = new User { Id = 1 };
+      var otherUsersGoal = new Goal { UserId = 100 };
+
+      testObject.ControllerContext = new HttpControllerContext
+      {
+        Request = new HttpRequestMessage()
+      };
+      testObject.ControllerContext.Request.Headers.Add("auth", Guid.NewGuid().ToString());
+
+      tokenStore.GetExistingValidTokenByGuidAsync(Arg.Any<Guid>()).Returns(new Token());
+      userStore.GetUserAsync(Arg.Any<Token>()).Returns(currentUser);
+      goalStore.GetGoalAsync(123).Returns(otherUsersGoal);
+
+      // Act.
+      var result = await testObject.DeleteLastAttemptAsync(123);
+
+      // Assert.
+      var notFoundResult = result as NotFoundResult;
+
+      Assert.NotNull(notFoundResult);
+    }
+
+    //---------------------------------------------------------------------------------------------
 
     [Test]
     public async Task GetAttemptsAsync_GivenValidGoal_ShouldReturnAttempts()
@@ -493,7 +671,8 @@ namespace BearChaser.Test.Controllers.Api
         }
       };
 
-      attemptStore.GetAttemptsAsync(123).Returns(attempts);
+      attemptStore.GetAttempts(123).Returns(
+        new MockDbAsyncEnumerable<GoalAttempt>(attempts));
 
       // Act.
       var result = await testObject.GetAttemptsAsync(123);
