@@ -101,6 +101,7 @@
     <Compile Include="Stores\GoalStore_Test.cs" />
     <Compile Include="Stores\SettingsStore_Test.cs" />
     <Compile Include="Stores\TokenStore_Test.cs" />
+    <Compile Include="TestUtils\MockDbAsyncQueryProvider.cs" />
     <Compile Include="Utils\Logging\Log_Test.cs" />
     <Compile Include="Utils\StringExtensions_Test.cs" />
   </ItemGroup>

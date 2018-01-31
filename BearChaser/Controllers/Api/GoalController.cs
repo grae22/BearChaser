@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -189,8 +190,11 @@ namespace BearChaser.Controllers.Api
 
       GetPeriodBoundsForTime(goal, _dateTime.Now, out DateTime periodStart, out DateTime periodEnd);
 
-      var attempts = await _goalAttemptStore.GetAttemptsAsync(goalId);
-      attempts = attempts.Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd);
+      var attempts = await
+        _goalAttemptStore
+          .GetAttempts(goalId)
+          .Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd)
+          .ToListAsync();
 
       var avgPercentCompleteAcrossPeriods =
         await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");

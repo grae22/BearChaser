@@ -13,6 +13,7 @@ using BearChaser.DataTransferObjects;
 using BearChaser.Db;
 using BearChaser.Models;
 using BearChaser.Stores;
+using BearChaser.Test.TestUtils;
 using BearChaser.Utils;
 using BearChaser.Utils.Logging;
 
@@ -709,18 +710,20 @@ namespace BearChaser.Test.Controllers.Api
         FrequencyWithinPeriod = 2,
         StartDate = new DateTime(2018, 1, 1)
       });
-
-      objects.Attempts.GetAttemptsAsync(123).Returns(new List<GoalAttempt>
-      {
-        new GoalAttempt
-        {
-          Timestamp = requestDate.AddDays(-1)
-        },
-        new GoalAttempt
-        {
-          Timestamp = requestDate.AddHours(12)
-        }
-      });
+      
+      objects.Attempts.GetAttempts(123).Returns(
+        new MockDbAsyncEnumerable<GoalAttempt>(
+          new List<GoalAttempt>
+          {
+            new GoalAttempt
+            {
+              Timestamp = requestDate.AddDays(-1)
+            },
+            new GoalAttempt
+            {
+              Timestamp = requestDate.AddHours(12)
+            }
+          }));
 
       objects.DbQuery.ExecuteSql<int>(Arg.Any<string>()).Returns(new List<int> { 100 });
 
