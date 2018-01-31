@@ -143,7 +143,7 @@
         
         goals = JSON.parse(goals);
         
-        var content = '<table cellPadding=4>';
+        var content = '<table cellPadding="4">';
         
         $.each(goals, function(i, e)
         {
@@ -181,9 +181,9 @@
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control"><tr>' +
-          '<td>(' + stats.AttemptCount + '/' + stats.TargetAttemptCount + ')</td>' +
-          '<td>' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</td>' +
-          '<td>(' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%)</td>' +
+          '<td><span class="text-nowrap">(' + stats.AttemptCount + '/' + stats.TargetAttemptCount + ')</span></td>' +
+          '<td><span class="text-nowrap">' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</span></td>' +
+          '<td><span class="text-nowrap">(' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%)</span></td>' +
           '</tr></table>');
       }
       
