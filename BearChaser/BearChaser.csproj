@@ -272,6 +272,10 @@
     <Compile Include="Migrations\201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.Designer.cs">
       <DependentUpon>201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.cs" />
+    <Compile Include="Migrations\201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.Designer.cs">
+      <DependentUpon>201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
     <Compile Include="Models\Goal.cs" />
@@ -400,6 +404,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.resx">
       <DependentUpon>201801301154201_AddingSpCalculateGoalAverageCompletionAcrossLast3Periods.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.resx">
+      <DependentUpon>201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
