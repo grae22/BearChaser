@@ -178,6 +178,8 @@
       {
         var stats = JSON.parse(data);
         
+        $('#attemptsForGoal' + goalId).empty();
+        
         $('#attemptsForGoal' + goalId).append(
           stats.AttemptCount + '/' + stats.TargetAttemptCount + ' ' +
           '| ' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + ' | ' +
@@ -192,7 +194,7 @@
           type: 'POST',
           headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
-          success: function () { console.log('Added goal-attempt.'); GetAndPopulateGoals(); },
+          success: function () { console.log('Added goal-attempt.'); GetAndPopulateStats(goalId); },
           error: function (xhr, status, error) { alert('Error adding goal-attempt: ' + error); }
         });
       }
