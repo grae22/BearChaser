@@ -5,11 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/hot-sneaks/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
   </head>
   <body>
-    <br />
     <p id='goalSection' />
     <div>
       <form id='loginForm'>
@@ -19,7 +20,7 @@
         <input id='doRegister' type='button' value='Register' />
       </form>
       <br />
-      <form id='addGoalForm' class="form-group">
+      <form id='addGoalForm' class='form-group'>
         <table>
           <tr>
             <td>Title</td>
@@ -27,7 +28,17 @@
           </tr>
           <tr>
             <td>Period</td>
-            <td><input id='periodInHours' type='text' value='24' /></td>
+            <td>
+              <select id='periodInHours'>
+                <option value='24'>Daily</option>
+                <option value='48'>Every 2nd day</option>
+                <option value='168'>Weekly</option>
+                <option value='336'>Fortnightly</option>
+                <option value='720'>Monthly</option>
+                <option value='4380'>Half yearly</option>
+                <option value='8760'>Yearly</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Frequency</td>
@@ -105,6 +116,10 @@
         
         // Do these things on load.
         $('#addGoalForm').hide();
+        
+        // Init the add-goal datepicker.
+        $('#startDate').datepicker();
+        $('#startDate').datepicker('option', 'dateFormat', 'yy-mm-dd');        
         
         // Auto-login if we have credentials.
         $('#username').val(GetCookie('username'));
