@@ -87,6 +87,8 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // GET: api/goals
+
     [HttpGet]
     [Route("api/goals")]
     public async Task<IHttpActionResult> GetGoalsAsync()
@@ -122,8 +124,10 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
+    // POST: api/goals
+
     [HttpPost]
-    [Route("api/goals/create")]
+    [Route("api/goals")]
     public async Task<IHttpActionResult> CreateGoalAsync(GoalData goalData)
     {
       _log.LogDebug($"Request: {JsonConvert.SerializeObject(goalData)}");
@@ -158,6 +162,8 @@ namespace BearChaser.Controllers.Api
     }
 
     //---------------------------------------------------------------------------------------------
+
+    // GET: api/goals/periodStats?goalId=123
 
     [HttpGet]
     [Route("api/goals/periodStats")]

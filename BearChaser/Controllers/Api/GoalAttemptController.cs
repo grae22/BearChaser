@@ -69,11 +69,10 @@ namespace BearChaser.Controllers.Api
 
     //---------------------------------------------------------------------------------------------
 
-    // TODO: Do we need the 'create' as part of this endpoint? Surely just post to 'goalAttempts'?
-    // POST: api/goalAttemps/create
+    // POST: api/goalAttempts
 
     [HttpPost]
-    [Route("api/goalAttempts/create")]
+    [Route("api/goalAttempts")]
     public async Task<IHttpActionResult> CreateAttemptAsync(GoalAttemptData attempt)
     {
       _log.LogDebug($"Request: {JsonConvert.SerializeObject(attempt)}");
