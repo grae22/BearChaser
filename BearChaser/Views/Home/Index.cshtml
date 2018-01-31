@@ -94,7 +94,7 @@
           var startDate = $('#startDate').val();
         
           $.ajax({
-            url: '/api/goals/create',
+            url: '/api/goals',
             type: 'POST',
             headers: { 'auth': GetToken() },
             data: { 'Id': 0, 'Name': name, 'PeriodInHours': period, 'FrequencyWithinPeriod': frequency, 'StartDate': startDate },
@@ -190,7 +190,7 @@
       function CreateGoalAttempt(goalId)
       {
         $.ajax({
-          url: '/api/goalAttempts/create',
+          url: '/api/goalAttempts',
           type: 'POST',
           headers: { 'auth': GetToken() },
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
