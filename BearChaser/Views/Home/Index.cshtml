@@ -148,9 +148,10 @@
         $.each(goals, function(i, e)
         {
           content +=
-            "<tr><td>" + e.Name + "</td><td><input id='goalAttempt" + e.Id +
-            "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' />" +
-            " <span id='attemptsForGoal" + e.Id + "' /></td></tr>";
+            "<tr><td>" + e.Name + "</td><td>" +
+            "<input id='goalAttempt" + e.Id + "' type='button' value='+' onclick='CreateGoalAttempt(" + e.Id + ")' /> " +
+            "<input id='removeLastAttempt" + e.Id + "' type='button' value='-' onclick='RemoveLastGoalAttempt(" + e.Id + ")' /> " +
+            "<span id='attemptsForGoal" + e.Id + "' /></td></tr>";
         });
         
         $('#goalSection').empty();
@@ -196,6 +197,22 @@
           data: { 'Id': 0, 'GoalId': goalId, 'Timestamp': null },
           success: function () { console.log('Added goal-attempt.'); GetAndPopulateStats(goalId); },
           error: function (xhr, status, error) { alert('Error adding goal-attempt: ' + error); }
+        });
+      }
+
+      function RemoveLastGoalAttempt(goalId)
+      {
+        if (confirm('Delete the last goal attempt?') == false)
+        {
+          return;
+        }
+      
+        $.ajax({
+          url: '/api/goalAttempts?goalId=' + goalId,
+          type: 'DELETE',
+          headers: { 'auth': GetToken() },
+          success: function () { console.log('Removed goal-attempt.'); GetAndPopulateStats(goalId); },
+          error: function (xhr, status, error) { alert('Error removing last goal-attempt: ' + error); }
         });
       }
       
