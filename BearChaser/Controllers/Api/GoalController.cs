@@ -249,12 +249,11 @@ namespace BearChaser.Controllers.Api
     private async Task PopulateWithGoalCompletionStats(int goalId, GoalPeriodStatsData stats)
     {
       // All periods.
-      var avgCompletionAcrossAllPeriodsResults =
-        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
+      var results = await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
 
-      if (avgCompletionAcrossAllPeriodsResults.Count > 0)
+      if (results.Count > 0)
       {
-        stats.AverageCompletionAcrossAllPeriods = avgCompletionAcrossAllPeriodsResults[0];
+        stats.AverageCompletionAcrossAllPeriods = results[0];
       }
       else
       {
@@ -262,12 +261,11 @@ namespace BearChaser.Controllers.Api
       }
 
       // Last 3 periods.
-      var avgCompletionAcrossLast3PeriodsResults =
-        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods {goalId}");
+      results = await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods {goalId}");
 
-      if (avgCompletionAcrossAllPeriodsResults.Count > 0)
+      if (results.Count > 0)
       {
-        stats.AverageCompletionAcrossLast3Periods = avgCompletionAcrossLast3PeriodsResults[0];
+        stats.AverageCompletionAcrossLast3Periods = results[0];
       }
       else
       {
