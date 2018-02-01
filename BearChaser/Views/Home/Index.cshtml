@@ -77,13 +77,9 @@
           var username = $('#username').val();
           var password = $('#password').val();
           
-          var now = new Date();
-          var expiryTime = now.getTime() + (30 * 24 * 60 * 60 * 1000);
-          now.setTime(expiryTime);
-
-          document.cookie = 'username=' + username + ';secure;expires=' + now.toUTCString();
-          document.cookie = 'password=' + password + ';secure;expires=' + now.toUTCString();
-        
+          SetStoredValue('username', username);
+          SetStoredValue('password', password);
+                  
           $.post(
             '/api/users/login',
             { 'username': username, 'password': password },
@@ -119,11 +115,11 @@
         
         // Init the add-goal datepicker.
         $('#startDate').datepicker();
-        $('#startDate').datepicker('option', 'dateFormat', 'yy-mm-dd');        
+        $('#startDate').datepicker('option', 'dateFormat', 'yy-mm-dd');
         
         // Auto-login if we have credentials.
-        $('#username').val(GetCookie('username'));
-        $('#password').val(GetCookie('password'));
+        $('#username').val(GetStoredValue('username'));
+        $('#password').val(GetStoredValue('password'));
 
         if ($('#username').val().length > 0 && $('#password').val().length > 0)
         {
@@ -133,11 +129,8 @@
       
       function UpdateToken(data)
       {
-        console.log(data);
         var token = data.replace(/\"/g, '');
-        console.log(token);
-        
-        document.cookie = 'token=' + token + ';secure';
+        SetSessionValue('token', token);
       }
       
       function GetAndPopulateGoals()      
@@ -279,8 +272,52 @@
       
       function GetToken()
       {
-        return GetCookie('token');
-      }      
+        return GetSessionValue('token');
+      }
+      
+      function GetStoredValue(name, defaultValue)
+      {
+        if (typeof(Storage) == 'undefined')
+        {
+          console.log('No local-storage available.');
+          return defaultValue;
+        }
+        
+        return localStorage.getItem(name);
+      }
+
+      function SetStoredValue(name, value)
+      {
+        if (typeof(Storage) == 'undefined')
+        {
+          console.log('No local-storage available.');
+          return defaultValue;
+        }
+        
+        localStorage.setItem(name, value);
+      }
+      
+      function GetSessionValue(name, defaultValue)
+      {
+        if (typeof(Storage) == 'undefined')
+        {
+          console.log('No local-storage available.');
+          return defaultValue;
+        }
+        
+        return sessionStorage.getItem(name);
+      }
+
+      function SetSessionValue(name, value)
+      {
+        if (typeof(Storage) == 'undefined')
+        {
+          console.log('No local-storage available.');
+          return defaultValue;
+        }
+        
+        sessionStorage.setItem(name, value);
+      }
     </script
   </body>
 </html>
