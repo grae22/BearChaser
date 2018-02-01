@@ -197,7 +197,7 @@
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control"><tr>' +
           '<td><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
-          '<td><span class="text-nowrap small">' + $.format.date(stats.PeriodEnd, 'dd-MM-yyyy') + '</span></td>' +
+          '<td><span class="text-nowrap small">' + GetFriendlyTimeRemaining(stats.PeriodEnd) + '</span></td>' +
           '<td><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
           '</tr></table>');
       }
@@ -228,6 +228,40 @@
           success: function () { console.log('Removed goal-attempt.'); GetAndPopulateStats(goalId); },
           error: function (xhr, status, error) { alert('Error removing last goal-attempt: ' + error); }
         });
+      }
+      
+      function GetFriendlyTimeRemaining(date)
+      {
+        var diff = new Date(date) - Date.now();
+        var hours = Math.floor(diff / 1000 / 60 / 60);
+        var days = Math.floor(hours / 24);
+        var weeks = Math.floor(days / 7);
+        var months = Math.floor(weeks / 4);
+        var resultValue = 0;
+        var resultUnit = '';
+        
+        if (months > 0)
+        {
+          resultValue = months;
+          resultUnit = 'month';
+        }
+        else if (weeks > 0)
+        {
+          resultValue = weeks;
+          resultUnit = 'week';
+        }
+        else if (days > 0)
+        {
+          resultValue = days;
+          resultUnit = 'day';
+        }
+        else
+        {
+          resultValue = hours;
+          resultUnit = 'hour';
+        }
+
+        return resultValue + ' ' + (resultValue > 1 ? resultUnit + 's' : resultUnit);
       }
       
       function GetCookie(name)
