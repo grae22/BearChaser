@@ -193,11 +193,17 @@
       function PopulateStats(data, goalId)
       {
         var stats = JSON.parse(data);
+        
+        var friendlyTimeRemaining = '---';
+        if (stats.AttemptCount < stats.TargetAttemptCount)
+        {
+          friendlyTimeRemaining = GetFriendlyTimeRemaining(stats.PeriodEnd);
+        }
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control"><tr>' +
           '<td><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
-          '<td><span class="text-nowrap small">' + GetFriendlyTimeRemaining(stats.PeriodEnd) + '</span></td>' +
+          '<td><span class="text-nowrap small">' + friendlyTimeRemaining + '</span></td>' +
           '<td><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
           '</tr></table>');
       }
