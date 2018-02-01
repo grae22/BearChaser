@@ -93,6 +93,8 @@ namespace BearChaser.Controllers.Api
     [Route("api/goals")]
     public async Task<IHttpActionResult> GetGoalsAsync()
     {
+      _log.LogDebug("Request received.");
+
       User user;
 
       try
@@ -108,16 +110,16 @@ namespace BearChaser.Controllers.Api
         return InternalServerError();
       }
 
-      var goals = await _goalStore.GetGoalsAsync(user.Id);
+      var usersGoals = await _goalStore.GetGoalsAsync(user.Id);
 
       var goalDatas = new List<GoalData>();
-      goals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
+      usersGoals.ForEach(g => goalDatas.Add(Mapper.Map<GoalData>(g)));
 
       goalDatas.Sort((g1, g2) => string.Compare(g1.Name, g2.Name));
 
       string serializeData = JsonConvert.SerializeObject(goalDatas);
 
-      _log.LogDebug($"Retrieved user's goals {serializeData}.");
+      _log.LogDebug($"Returning goals {serializeData}.");
 
       return Ok(serializeData);
     }
@@ -169,7 +171,7 @@ namespace BearChaser.Controllers.Api
     [Route("api/goals/periodStats")]
     public async Task<IHttpActionResult> GetPeriodStatsAsync(int goalId)
     {
-      _log.LogDebug($"Request: {goalId}");
+      _log.LogDebug($"Request: goalId={goalId}");
 
       User user;
 
@@ -196,28 +198,18 @@ namespace BearChaser.Controllers.Api
 
       GetPeriodBoundsForTime(goal, _dateTime.Now, out DateTime periodStart, out DateTime periodEnd);
 
-      var attempts = await
-        _goalAttemptStore
-          .GetAttempts(goalId)
-          .Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd)
-          .ToListAsync();
-
-      var avgPercentCompleteAcrossPeriods =
-        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
-
-      var avgPercentCompleteAcrossLast3Periods =
-        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods {goalId}");
+      List<GoalAttempt> attempts = await GetAttemptsForPeriod(goalId, periodStart, periodEnd);
 
       var stats = new GoalPeriodStatsData
       {
         GoalId = goal.Id,
         PeriodStart = periodStart,
         PeriodEnd = periodEnd,
-        AttemptCount = attempts.Count(),
-        TargetAttemptCount = goal.FrequencyWithinPeriod,
-        AverageCompletionAcrossAllPeriods = avgPercentCompleteAcrossPeriods[0],
-        AverageCompletionAcrossLast3Periods = avgPercentCompleteAcrossLast3Periods[0]
+        AttemptCount = attempts.Count,
+        TargetAttemptCount = goal.FrequencyWithinPeriod
       };
+
+      await PopulateWithGoalCompletionStats(goalId, stats);
 
       _log.LogDebug($"Retrieved stats for user {user.Id}, goal {goalId} : {JsonConvert.SerializeObject(stats)}");
 
@@ -236,6 +228,51 @@ namespace BearChaser.Controllers.Api
 
       periodStart = goal.StartDate.AddHours(periodsSinceStart * goal.PeriodInHours);
       periodEnd = goal.StartDate.AddHours((periodsSinceStart + 1) * goal.PeriodInHours).AddSeconds(-1);
+    }
+
+
+    //---------------------------------------------------------------------------------------------
+
+    private async Task<List<GoalAttempt>> GetAttemptsForPeriod(int goalId,
+                                                               DateTime periodStart,
+                                                               DateTime periodEnd)
+    {
+      return await
+        _goalAttemptStore
+          .GetAttempts(goalId)
+          .Where(a => a.Timestamp >= periodStart && a.Timestamp <= periodEnd)
+          .ToListAsync();
+    }
+
+    //---------------------------------------------------------------------------------------------
+
+    private async Task PopulateWithGoalCompletionStats(int goalId, GoalPeriodStatsData stats)
+    {
+      // All periods.
+      var avgCompletionAcrossAllPeriodsResults =
+        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossAllPeriods {goalId}");
+
+      if (avgCompletionAcrossAllPeriodsResults.Count > 0)
+      {
+        stats.AverageCompletionAcrossAllPeriods = avgCompletionAcrossAllPeriodsResults[0];
+      }
+      else
+      {
+        _log.LogError($"Failed to retrieve goal average completion across all periods stats for goal {goalId}.");
+      }
+
+      // Last 3 periods.
+      var avgCompletionAcrossLast3PeriodsResults =
+        await _dbQuery.ExecuteSql<int>($"EXEC dbo.sp_CalculateGoalAverageCompletionAcrossLast3Periods {goalId}");
+
+      if (avgCompletionAcrossAllPeriodsResults.Count > 0)
+      {
+        stats.AverageCompletionAcrossLast3Periods = avgCompletionAcrossLast3PeriodsResults[0];
+      }
+      else
+      {
+        _log.LogError($"Failed to retrieve goal average completion across last 3 periods stats for goal {goalId}.");
+      }
     }
 
     //---------------------------------------------------------------------------------------------

@@ -1,6 +1,10 @@
 ﻿General
 -------
 x All internal date handling should use UTC dates.
+x 'Using' directives order:
+  1. System
+  2. 3rd party
+  3. BearChaser
 
 Db Error Codes
 --------------
