@@ -97,6 +97,7 @@
             {
               $('#loginForm').hide();
               $('#addGoalForm').show();
+              $('#doLogOut').show();
               UpdateToken(token);
               GetAndPopulateGoals();
             });
@@ -130,6 +131,7 @@
         
         // Do these things on load.
         $('#addGoalForm').hide();
+        $('#doLogOut').hide();
         
         // Init the add-goal datepicker.
         $('#startDate').datepicker();
