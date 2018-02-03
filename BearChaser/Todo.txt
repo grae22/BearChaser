@@ -1,4 +1,5 @@
-﻿x Remove goal API & frontend support.
+﻿x Display time since last attempt (probably directly below time remaining).
+x Remove goal API & frontend support.
 x Mechanism for renewing/replacing user token.
 x Review async calls to use ConfigureAwait(false).
 x Support for 'do less' - in addition to recording 'attempts' to reflect action, may want to (positively) reflect lack of action (e.g. quitting smoking).

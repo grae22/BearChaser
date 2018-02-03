@@ -710,21 +710,20 @@ namespace BearChaser.Test.Controllers.Api
         FrequencyWithinPeriod = 2,
         StartDate = new DateTime(2018, 1, 1)
       });
-      
-      objects.Attempts.GetAttempts(123).Returns(
-        new MockDbAsyncEnumerable<GoalAttempt>(
-          new List<GoalAttempt>
-          {
-            new GoalAttempt
-            {
-              Timestamp = requestDate.AddDays(-1)
-            },
-            new GoalAttempt
-            {
-              Timestamp = requestDate.AddHours(12)
-            }
-          }));
 
+      var attempts = new List<GoalAttempt>
+      {
+        new GoalAttempt
+        {
+          Timestamp = requestDate.AddDays(-1)
+        },
+        new GoalAttempt
+        {
+          Timestamp = requestDate.AddHours(12)
+        }
+      };
+
+      objects.Attempts.GetAttempts(123).Returns(new MockDbAsyncEnumerable<GoalAttempt>(attempts));
       objects.DbQuery.ExecuteSql<int>(Arg.Any<string>()).Returns(new List<int> { 100 });
 
       // Act.
@@ -745,6 +744,7 @@ namespace BearChaser.Test.Controllers.Api
       Assert.AreEqual(endOfDay, stats.PeriodEnd);
       Assert.AreEqual(1, stats.AttemptCount);
       Assert.AreEqual(2, stats.TargetAttemptCount);
+      Assert.AreEqual(attempts[1].Timestamp, stats.LastAttemptDate);
       Assert.AreEqual(100, stats.AverageCompletionAcrossAllPeriods);
       Assert.AreEqual(100, stats.AverageCompletionAcrossLast3Periods);
     }
