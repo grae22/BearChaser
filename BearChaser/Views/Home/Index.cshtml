@@ -190,7 +190,13 @@
         var friendlyTimeRemaining = '---';
         if (stats.AttemptCount < stats.TargetAttemptCount)
         {
-          friendlyTimeRemaining = GetFriendlyTimeRemaining(stats.PeriodEnd);
+          friendlyTimeRemaining = GetFriendlyTimeDifference(stats.PeriodEnd);
+        }
+
+        var friendlyTimeSinceLastAttempt = '---';
+        if (stats.LastAttemptDate != null)
+        {
+          friendlyTimeSinceLastAttempt = GetFriendlyTimeDifference(stats.LastAttemptDate);
         }
        
         $('#statsPlaceholderForGoal' + goalId).html(
@@ -198,8 +204,8 @@
           '<td><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
           '<td><span class="text-nowrap small">' +
             '<table>' +
-              '<tr><td>' + friendlyTimeRemaining + '</td></tr>' +
-              '<tr><td style="color: lightgrey;">' + friendlyTimeRemaining + '</td></tr>' +
+              '<tr><td style="text-align: center;">' + friendlyTimeRemaining + '</td></tr>' +
+              '<tr><td style="color: lightgrey; text-align: center;">' + friendlyTimeSinceLastAttempt + '</td></tr>' +
             '</table>' +
           '</span></td>' +
           '<td><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
@@ -234,9 +240,13 @@
         });
       }
       
-      function GetFriendlyTimeRemaining(date)
+      function GetFriendlyTimeDifference(date)
       {
-        var diff = new Date(date) - Date.now();
+        date = date.replace('T', 'Z');
+
+        var utcNow = Date.now();
+        var testDate = new Date(date);
+        var diff = Math.abs(testDate - utcNow);
         var hours = Math.floor(diff / 1000 / 60 / 60);
         var days = Math.floor(hours / 24);
         var weeks = Math.floor(days / 7);
@@ -259,13 +269,25 @@
           resultValue = days;
           resultUnit = 'day';
         }
-        else
+        else if (hours > 0)
         {
           resultValue = hours;
           resultUnit = 'hour';
         }
+        else
+        {
+          resultValue = null;
+          resultUnit = '< hour';
+        }
 
-        return resultValue + ' ' + (resultValue > 1 ? resultUnit + 's' : resultUnit);
+        var resultString = '';
+
+        if (resultValue != null)
+        {
+          resultString = resultValue + ' ';
+        }
+
+        return resultString + (resultValue > 1 ? resultUnit + 's' : resultUnit);
       }
       
       function GetCookie(name)
