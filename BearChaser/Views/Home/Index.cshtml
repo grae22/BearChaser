@@ -218,13 +218,16 @@
         {
           friendlyTimeSinceLastAttempt = GetFriendlyTimeDifference(stats.LastAttemptDate);
         }
+
+        var periodProgress = CalculatePeriodCompletionNow(stats.PeriodStart, stats.PeriodEnd);
+        var periodProgressColour = GetColourForPeriodProgress(periodProgress);
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control" width=100%><tr>' +
           '<td width=20%><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
           '<td width=20%><span class="text-nowrap small">' +
             '<table>' +
-              '<tr><td style="text-align: center;">' + friendlyTimeRemaining + '</td></tr>' +
+              '<tr><td style="text-align: center; color: ' + periodProgressColour + ';">' + friendlyTimeRemaining + '</td></tr>' +
               '<tr><td style="color: lightgrey; text-align: center;">' + friendlyTimeSinceLastAttempt + '</td></tr>' +
             '</table>' +
           '</span></td>' +
@@ -308,6 +311,33 @@
         }
 
         return resultString + (resultValue > 1 ? resultUnit + 's' : resultUnit);
+      }
+
+      function CalculatePeriodCompletionNow(periodStart, periodEnd)
+      {
+        periodStart = periodStart.replace('T', 'Z');
+        periodEnd = periodEnd.replace('T', 'Z');
+
+        var now = Date.now();
+        var start = (new Date(periodStart)).getTime();
+        var end = (new Date(periodEnd)).getTime();
+
+        return (now - start) / (end - start);
+      }
+
+      function GetColourForPeriodProgress(progress)
+      {
+        if (progress < 0.5)
+        {
+          return 'green';
+        }
+        
+        if (progress < 0.75)
+        {
+          return 'orange';
+        }
+
+        return 'red';
       }
       
       function GetCookie(name)
