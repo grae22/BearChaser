@@ -10,7 +10,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
   </head>
-  <body>
+  <body style='background: whitesmoke;'>
     <p id='goalSection' />
     <div>
       <form id='loginForm' class='form-group'>
@@ -226,21 +226,27 @@
       function PopulateStats(data, goalId)
       {
         var stats = JSON.parse(data);
+
+        var hasCompletedGoalForPeriod = (stats.AttemptCount >= stats.TargetAttemptCount);
         
-        var friendlyTimeRemaining = '---';
-        if (stats.AttemptCount < stats.TargetAttemptCount)
+        var friendlyTimeRemaining = ':D';
+        if (!hasCompletedGoalForPeriod)
         {
           friendlyTimeRemaining = GetFriendlyTimeDifference(stats.PeriodEnd);
         }
 
-        var friendlyTimeSinceLastAttempt = '---';
+        var friendlyTimeSinceLastAttempt = '~';
         if (stats.LastAttemptDate != null)
         {
           friendlyTimeSinceLastAttempt = GetFriendlyTimeDifference(stats.LastAttemptDate);
         }
 
         var periodProgress = CalculatePeriodCompletionNow(stats.PeriodStart, stats.PeriodEnd);
-        var periodProgressColour = GetColourForPeriodProgress(periodProgress);
+        var periodProgressColour = 'purple';
+        if (!hasCompletedGoalForPeriod)
+        {
+          periodProgressColour = GetColourForPeriodProgress(periodProgress);
+        }
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control" width=100%><tr>' +
