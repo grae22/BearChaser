@@ -10,12 +10,13 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
   </head>
-  <body>
+  <body style='background: whitesmoke;'>
     <p id='goalSection' />
     <div>
-      <form id='loginForm'>
+      <form id='loginForm' class='form-group'>
         <input id='username' type='text' /><br />
         <input id='password' type='password' /><br />
+        <input id='rememberMe' type='checkbox' checked />Remember me<br />
         <input id='doLogin' type='button' value='Login' />
         <input id='doRegister' type='button' value='Register' />
       </form>
@@ -54,12 +55,16 @@
           </tr>
         </table>          
       </form>
+      <div style='alignment: right;'><input id='doLogOut' type='button' value='Log out' /></div>
     </div>
 
     <script type='text/javascript'>
-      $(document).ready(function ()      
+      //=======================================================================
+
+      $(document).ready(function ()
       {
-        // Register.
+        //---------------------------------------------------------------------
+
         $('#doRegister').click(function ()
         {
           var username = $('#username').val();
@@ -71,14 +76,23 @@
             function () { alert('Registered'); });
         });
 
-        // Login.
+        //---------------------------------------------------------------------
+
         $('#doLogin').click(function ()
         {
           var username = $('#username').val();
           var password = $('#password').val();
+          var usernameToStore = username;
+          var passwordToStore = password;
+
+          if ($('#rememberMe').is(':checked') === false)
+          {
+            usernameToStore = '';
+            passwordToStore = '';
+          }
           
-          SetStoredValue('username', username);
-          SetStoredValue('password', password);
+          SetStoredValue('username', usernameToStore);
+          SetStoredValue('password', passwordToStore);
                   
           $.post(
             '/api/users/login',
@@ -87,12 +101,14 @@
             {
               $('#loginForm').hide();
               $('#addGoalForm').show();
+              $('#doLogOut').show();
               UpdateToken(token);
               GetAndPopulateGoals();
             });
         });
 
-        // Add Goal.
+        //---------------------------------------------------------------------
+
         $('#doAddGoal').click(function ()
         {
           var name = $('#goal').val();
@@ -109,9 +125,21 @@
             error: function (xhr, status, error) { alert('Error adding goal: ' + error); }
           });
         });
+
+        //---------------------------------------------------------------------
+
+        $('#doLogOut').click(function ()
+        {
+          SetStoredValue('username', '');
+          SetStoredValue('password', '');
+          location.reload();
+        });
         
+        //---------------------------------------------------------------------
+
         // Do these things on load.
         $('#addGoalForm').hide();
+        $('#doLogOut').hide();
         
         // Init the add-goal datepicker.
         $('#startDate').datepicker();
@@ -125,13 +153,19 @@
         {
           document.getElementById('doLogin').click();
         }
+
+        //---------------------------------------------------------------------
       });
+
+      //=======================================================================
       
       function UpdateToken(data)
       {
         var token = data.replace(/\"/g, '');
         SetSessionValue('token', token);
       }
+
+      //-----------------------------------------------------------------------
       
       function GetAndPopulateGoals()      
       {
@@ -144,6 +178,8 @@
           error: function (xhr, status, error) { alert('Error retrieving goals: ' + error); }
         });
       }
+
+      //-----------------------------------------------------------------------
       
       function PopulateGoals(goals)
       {
@@ -170,6 +206,8 @@
           GetAndPopulateStats(e.Id);
         });
       }
+
+      //-----------------------------------------------------------------------
       
       function GetAndPopulateStats(goalId)
       {
@@ -182,29 +220,48 @@
           error: function (xhr, status, error) { alert('Error retrieving attempts: ' + error); }
         });
       }
+
+      //-----------------------------------------------------------------------
       
       function PopulateStats(data, goalId)
       {
         var stats = JSON.parse(data);
+
+        var hasCompletedGoalForPeriod = (stats.AttemptCount >= stats.TargetAttemptCount);
         
-        var friendlyTimeRemaining = '---';
-        if (stats.AttemptCount < stats.TargetAttemptCount)
+        var friendlyTimeRemaining = ':D';
+        if (!hasCompletedGoalForPeriod)
         {
-          friendlyTimeRemaining = GetFriendlyTimeRemaining(stats.PeriodEnd);
+          friendlyTimeRemaining = GetFriendlyTimeDifference(stats.PeriodEnd);
+        }
+
+        var friendlyTimeSinceLastAttempt = '~';
+        if (stats.LastAttemptDate != null)
+        {
+          friendlyTimeSinceLastAttempt = GetFriendlyTimeDifference(stats.LastAttemptDate);
+        }
+
+        var periodProgress = CalculatePeriodCompletionNow(stats.PeriodStart, stats.PeriodEnd);
+        var periodProgressColour = 'purple';
+        if (!hasCompletedGoalForPeriod)
+        {
+          periodProgressColour = GetColourForPeriodProgress(periodProgress);
         }
        
         $('#statsPlaceholderForGoal' + goalId).html(
-          '<table cellPadding="3" class="form-control"><tr>' +
-          '<td><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
-          '<td><span class="text-nowrap small">' +
+          '<table cellPadding="3" class="form-control" width=100%><tr>' +
+          '<td width=20%><span class="text-nowrap"><b>' + stats.AttemptCount + '/' + stats.TargetAttemptCount + '</b></span></td>' +
+          '<td width=20%><span class="text-nowrap small">' +
             '<table>' +
-              '<tr><td>' + friendlyTimeRemaining + '</td></tr>' +
-              '<tr><td style="color: lightgrey;">' + friendlyTimeRemaining + '</td></tr>' +
+              '<tr><td style="text-align: center; color: ' + periodProgressColour + ';">' + friendlyTimeRemaining + '</td></tr>' +
+              '<tr><td style="color: lightgrey; text-align: center;">' + friendlyTimeSinceLastAttempt + '</td></tr>' +
             '</table>' +
           '</span></td>' +
-          '<td><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
+          '<td style="text-align: center;"><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
           '</tr></table>');
       }
+
+      //-----------------------------------------------------------------------
       
       function CreateGoalAttempt(goalId)
       {
@@ -217,6 +274,8 @@
           error: function (xhr, status, error) { alert('Error adding goal-attempt: ' + error); }
         });
       }
+
+      //-----------------------------------------------------------------------
 
       function RemoveLastGoalAttempt(goalId)
       {
@@ -233,10 +292,16 @@
           error: function (xhr, status, error) { alert('Error removing last goal-attempt: ' + error); }
         });
       }
+
+      //-----------------------------------------------------------------------
       
-      function GetFriendlyTimeRemaining(date)
+      function GetFriendlyTimeDifference(date)
       {
-        var diff = new Date(date) - Date.now();
+        date = date.replace('T', 'Z');
+
+        var utcNow = Date.now();
+        var testDate = new Date(date);
+        var diff = Math.abs(testDate - utcNow);
         var hours = Math.floor(diff / 1000 / 60 / 60);
         var days = Math.floor(hours / 24);
         var weeks = Math.floor(days / 7);
@@ -259,14 +324,59 @@
           resultValue = days;
           resultUnit = 'day';
         }
-        else
+        else if (hours > 0)
         {
           resultValue = hours;
           resultUnit = 'hour';
         }
+        else
+        {
+          resultValue = null;
+          resultUnit = '< hour';
+        }
 
-        return resultValue + ' ' + (resultValue > 1 ? resultUnit + 's' : resultUnit);
+        var resultString = '';
+
+        if (resultValue != null)
+        {
+          resultString = resultValue + ' ';
+        }
+
+        return resultString + (resultValue > 1 ? resultUnit + 's' : resultUnit);
       }
+
+      //-----------------------------------------------------------------------
+
+      function CalculatePeriodCompletionNow(periodStart, periodEnd)
+      {
+        periodStart = periodStart.replace('T', 'Z');
+        periodEnd = periodEnd.replace('T', 'Z');
+
+        var now = Date.now();
+        var start = (new Date(periodStart)).getTime();
+        var end = (new Date(periodEnd)).getTime();
+
+        return (now - start) / (end - start);
+      }
+
+      //-----------------------------------------------------------------------
+
+      function GetColourForPeriodProgress(progress)
+      {
+        if (progress < 0.5)
+        {
+          return 'green';
+        }
+        
+        if (progress < 0.75)
+        {
+          return 'orange';
+        }
+
+        return 'red';
+      }
+
+      //-----------------------------------------------------------------------
       
       function GetCookie(name)
       {
@@ -274,11 +384,15 @@
         var value = re.exec(document.cookie);
         return (value != null) ? unescape(value[1]) : null;
       }
+
+      //-----------------------------------------------------------------------
       
       function GetToken()
       {
         return GetSessionValue('token');
       }
+
+      //-----------------------------------------------------------------------
       
       function GetStoredValue(name, defaultValue)
       {
@@ -291,6 +405,8 @@
         return localStorage.getItem(name);
       }
 
+      //-----------------------------------------------------------------------
+
       function SetStoredValue(name, value)
       {
         if (typeof(Storage) == 'undefined')
@@ -301,6 +417,8 @@
         
         localStorage.setItem(name, value);
       }
+
+      //-----------------------------------------------------------------------
       
       function GetSessionValue(name, defaultValue)
       {
@@ -313,6 +431,8 @@
         return sessionStorage.getItem(name);
       }
 
+      //-----------------------------------------------------------------------
+
       function SetSessionValue(name, value)
       {
         if (typeof(Storage) == 'undefined')
@@ -323,6 +443,8 @@
         
         sessionStorage.setItem(name, value);
       }
-    </script
+
+      //-----------------------------------------------------------------------
+    </script>
   </body>
 </html>

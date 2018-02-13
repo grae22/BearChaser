@@ -198,14 +198,18 @@ namespace BearChaser.Controllers.Api
 
       GetPeriodBoundsForTime(goal, _dateTime.Now, out DateTime periodStart, out DateTime periodEnd);
 
-      List<GoalAttempt> attempts = await GetAttemptsForPeriod(goalId, periodStart, periodEnd);
+      List<GoalAttempt> attemptsInDateOrder = await GetAttemptsForPeriod(goalId, periodStart, periodEnd);
+      attemptsInDateOrder.Sort((a1, a2) => a1.Timestamp.CompareTo(a2.Timestamp));
+
+      var mostRecentAttempt = attemptsInDateOrder.LastOrDefault(a => true);
 
       var stats = new GoalPeriodStatsData
       {
         GoalId = goal.Id,
         PeriodStart = periodStart,
         PeriodEnd = periodEnd,
-        AttemptCount = attempts.Count,
+        AttemptCount = attemptsInDateOrder.Count,
+        LastAttemptDate = mostRecentAttempt?.Timestamp,
         TargetAttemptCount = goal.FrequencyWithinPeriod
       };
 
