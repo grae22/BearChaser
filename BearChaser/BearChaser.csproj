@@ -276,6 +276,10 @@
     <Compile Include="Migrations\201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.Designer.cs">
       <DependentUpon>201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802130828544_StatsProcsToOnlyConsiderCurrentAttemptsWhenTargetComplete.cs" />
+    <Compile Include="Migrations\201802130828544_StatsProcsToOnlyConsiderCurrentAttemptsWhenTargetComplete.Designer.cs">
+      <DependentUpon>201802130828544_StatsProcsToOnlyConsiderCurrentAttemptsWhenTargetComplete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Db\ApplicationDbContext.cs" />
     <Compile Include="Models\Goal.cs" />
@@ -407,6 +411,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.resx">
       <DependentUpon>201801311237470_FixingStatsProcsWhenNowIsBeforeGoalStartDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802130828544_StatsProcsToOnlyConsiderCurrentAttemptsWhenTargetComplete.resx">
+      <DependentUpon>201802130828544_StatsProcsToOnlyConsiderCurrentAttemptsWhenTargetComplete.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
