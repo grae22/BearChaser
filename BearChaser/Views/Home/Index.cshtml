@@ -247,6 +247,8 @@
         {
           periodProgressColour = GetColourForPeriodProgress(periodProgress);
         }
+
+        var currentPeriodCompletionPercent = (stats.AttemptCount / stats.TargetAttemptCount) * 100;
        
         $('#statsPlaceholderForGoal' + goalId).html(
           '<table cellPadding="3" class="form-control" width=100%><tr>' +
@@ -257,7 +259,7 @@
               '<tr><td style="color: lightgrey; text-align: center;">' + friendlyTimeSinceLastAttempt + '</td></tr>' +
             '</table>' +
           '</span></td>' +
-          '<td style="text-align: center;"><span class="text-nowrap"><b>' + stats.AverageCompletionAcrossLast3Periods + '% - ' + stats.AverageCompletionAcrossAllPeriods + '%</b></span></td>' +
+          '<td style="text-align: center;"><span class="text-nowrap"><b>' + Math.truncate(currentPeriodCompletionPercent) + '% - ' + stats.AverageCompletionAcrossLast3Periods + '%</b></span></td>' +
           '</tr></table>');
       }
 
